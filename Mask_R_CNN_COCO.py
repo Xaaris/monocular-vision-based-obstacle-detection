@@ -28,6 +28,8 @@ class InferenceConfig(CocoConfig):
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
+    IMAGE_MIN_DIM = 400
+    IMAGE_MAX_DIM = 512  # TODO: experiment with results and timing to see if its worth to lower this
 
 
 config = InferenceConfig()
@@ -66,6 +68,10 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
 # file_names = next(os.walk(IMAGE_DIR))[2]
 # image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
 # image = skimage.io.imread("data/test.jpg")
+
+def get_class_name_for_id(class_id):
+    return class_names[class_id]
+
 
 @timing
 def detect(image):
