@@ -1,5 +1,5 @@
 from Mask_R_CNN_COCO import detect, draw, get_class_name_for_id
-from Model import ObjectInstance, Box
+from Model import ObjectInstance, Box, DetectedObjects
 from ORB import get_keypoints_and_descriptors_for_object
 from utils.image_utils import get_frames, save_debug_image
 from utils.timer import print_timing_results, timing
@@ -40,15 +40,16 @@ def create_objects(result) -> [ObjectInstance]:
 
 if __name__ == "__main__":
 
+    detected_objects = DetectedObjects()
+
     for frame_number, frame in enumerate(get_frames(VIDEO_FILE, from_sec=1, to_sec=2)):
         result = detect(frame)
         result_frame = draw(frame, result)
         save_debug_image(result_frame, "frame_" + str(frame_number))
 
-        objects = create_objects(result)
+        newly_detected_objects = create_objects(result)
+        detected_objects.add_objects(newly_detected_objects)
 
-        first_object = objects[0]
-        for obj in objects:
-            print(first_object.similarity_to(obj))
+        print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
 
     print_timing_results()

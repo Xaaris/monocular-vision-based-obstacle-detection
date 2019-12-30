@@ -62,13 +62,6 @@ class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                'teddy bear', 'hair drier', 'toothbrush']
 
 
-## Run Object Detection
-
-# Load a random image from the images folder
-# file_names = next(os.walk(IMAGE_DIR))[2]
-# image = skimage.io.imread(os.path.join(IMAGE_DIR, random.choice(file_names)))
-# image = skimage.io.imread("data/test.jpg")
-
 def get_class_name_for_id(class_id):
     return class_names[class_id]
 
@@ -76,9 +69,8 @@ def get_class_name_for_id(class_id):
 @timing
 def detect(image):
     # Run detection
-    results = model.detect([image], verbose=1)
+    results = model.detect([image], verbose=0)
 
-    # Visualize results
     return results[0]
 
 
