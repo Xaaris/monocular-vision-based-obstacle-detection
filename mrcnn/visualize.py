@@ -7,18 +7,19 @@ Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
 """
 
-import os
-import sys
-import random
-import itertools
 import colorsys
+import itertools
+import os
+import random
+import sys
 
-import numpy as np
-from skimage.measure import find_contours
-import matplotlib.pyplot as plt
-from matplotlib import patches,  lines
-from matplotlib.patches import Polygon
 import IPython.display
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import patches, lines
+from matplotlib.patches import Polygon
+from skimage.measure import find_contours
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
@@ -66,6 +67,7 @@ def random_colors(N, bright=True):
     hsv = [(i / N, 1, brightness) for i in range(N)]
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
     random.shuffle(colors)
+    colors = [[int(channel * 255) for channel in color] for color in colors]
     return colors
 
 
@@ -75,7 +77,7 @@ def apply_mask(image, mask, color, alpha=0.5):
     for c in range(3):
         image[:, :, c] = np.where(mask == 1,
                                   image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c] * 255,
+                                  (1 - alpha) + alpha * color[c],
                                   image[:, :, c])
     return image
 
@@ -167,22 +169,23 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         plt.show()
 
 
-def draw_instances(image, boxes, masks, class_ids, class_names,
-                      scores=None, title="",
-                      figsize=(16, 16), ax=None,
-                      show_mask=True, show_bbox=True,
-                      colors=None, captions=None):
+def draw_instances(image,
+                   boxes,
+                   masks,
+                   class_ids,
+                   class_names,
+                   scores=None,
+                   show_mask=True,
+                   show_bbox=True,
+                   colors=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
     class_ids: [num_instances]
     class_names: list of class names of the dataset
     scores: (optional) confidence scores for each box
-    title: (optional) Figure title
     show_mask, show_bbox: To show masks and bounding boxes or not
-    figsize: (optional) the size of the image
     colors: (optional) An array or colors to use with each object
-    captions: (optional) A list of strings to use as captions for each object
     """
     # Number of instances
     N = boxes.shape[0]
@@ -194,7 +197,7 @@ def draw_instances(image, boxes, masks, class_ids, class_names,
     # Generate random colors
     colors = colors or random_colors(N)
 
-    masked_image = image.astype(np.uint32).copy()
+    masked_image = image.copy()
     for i in range(N):
         color = colors[i]
 
@@ -203,40 +206,22 @@ def draw_instances(image, boxes, masks, class_ids, class_names,
             # Skip this instance. Has no bbox. Likely lost in image cropping.
             continue
         y1, x1, y2, x2 = boxes[i]
-        # if show_bbox:
-        #     p = patches.Rectangle((x1, y1), x2 - x1, y2 - y1, linewidth=2,
-        #                           alpha=0.7, linestyle="dashed",
-        #                           edgecolor=color, facecolor='none')
-        #     ax.add_patch(p)
+        if show_bbox:
+            cv2.rectangle(masked_image, pt1=(x1, y1), pt2=(x2, y2), color=color, thickness=1)
 
         # Label
-        # if not captions:
-        #     class_id = class_ids[i]
-        #     score = scores[i] if scores is not None else None
-        #     label = class_names[class_id]
-        #     caption = "{} {:.3f}".format(label, score) if score else label
-        # else:
-        #     caption = captions[i]
-        # ax.text(x1, y1 + 8, caption,
-        #         color='w', size=11, backgroundcolor="none")
+        class_name = class_names[class_ids[i]]
+        confidence_score = scores[i]
+        label_text = f"{class_name}: {confidence_score :.3f}"
+        cv2.putText(masked_image, label_text, (x1, y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.3,
+                    color=(0, 0, 0), lineType=16)
 
         # Mask
         mask = masks[:, :, i]
         if show_mask:
             masked_image = apply_mask(masked_image, mask, color)
 
-        # Mask Polygon
-        # Pad to ensure proper polygons for masks that touch image edges.
-        padded_mask = np.zeros(
-            (mask.shape[0] + 2, mask.shape[1] + 2), dtype=np.uint8)
-        padded_mask[1:-1, 1:-1] = mask
-        contours = find_contours(padded_mask, 0.5)
-        for verts in contours:
-            # Subtract the padding and flip (y, x) to (x, y)
-            verts = np.fliplr(verts) - 1
-            p = Polygon(verts, facecolor="none", edgecolor=color)
-            # ax.add_patch(p)
-    return masked_image.astype(np.uint8)
+    return masked_image
 
 
 def display_differences(image,
