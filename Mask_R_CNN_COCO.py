@@ -72,8 +72,3 @@ def detect(image):
     results = model.detect([image], verbose=0)
 
     return results[0]
-
-
-@timing
-def draw(image, result):
-    return visualize.draw_instances(image, result['rois'], result['masks'], result['class_ids'], class_names, result['scores'])

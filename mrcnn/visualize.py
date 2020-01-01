@@ -21,6 +21,9 @@ from matplotlib import patches, lines
 from matplotlib.patches import Polygon
 from skimage.measure import find_contours
 
+from Model import DetectedObjects, Box
+from utils.timer import timing
+
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")
 
@@ -169,15 +172,11 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         plt.show()
 
 
+@timing
 def draw_instances(image,
-                   boxes,
-                   masks,
-                   class_ids,
-                   class_names,
-                   scores=None,
+                   detected_objects: DetectedObjects,
                    show_mask=True,
-                   show_bbox=True,
-                   colors=None):
+                   show_bbox=True):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -188,38 +187,39 @@ def draw_instances(image,
     colors: (optional) An array or colors to use with each object
     """
     # Number of instances
-    N = boxes.shape[0]
-    if not N:
-        print("\n*** No instances to display *** \n")
-    else:
-        assert boxes.shape[0] == masks.shape[-1] == class_ids.shape[0]
-
-    # Generate random colors
-    colors = colors or random_colors(N)
+    number_of_objects = len(detected_objects.objects)
 
     masked_image = image.copy()
-    for i in range(N):
-        color = colors[i]
+    for i in range(number_of_objects):
+        obj = detected_objects.objects[i]
 
-        # Bounding box
-        if not np.any(boxes[i]):
-            # Skip this instance. Has no bbox. Likely lost in image cropping.
-            continue
-        y1, x1, y2, x2 = boxes[i]
-        if show_bbox:
-            cv2.rectangle(masked_image, pt1=(x1, y1), pt2=(x2, y2), color=color, thickness=1)
+        if obj.is_present():
 
-        # Label
-        class_name = class_names[class_ids[i]]
-        confidence_score = scores[i]
-        label_text = f"{class_name}: {confidence_score :.3f}"
-        cv2.putText(masked_image, label_text, (x1, y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.3,
-                    color=(0, 0, 0), lineType=16)
+            current_instance = obj.get_current_instance()
 
-        # Mask
-        mask = masks[:, :, i]
-        if show_mask:
-            masked_image = apply_mask(masked_image, mask, color)
+            color = static_colors[i]
+
+            # Bounding box
+            if not np.any(current_instance.roi):
+                # Skip this instance. Has no bbox. Likely lost in image cropping.
+                continue
+            box: Box = current_instance.roi
+            pt1 = (box.x1, box.y1)
+            pt2 = (box.x2, box.y2)
+            if show_bbox:
+                cv2.rectangle(masked_image, pt1=pt1, pt2=pt2, color=color, thickness=1)
+
+            # Label
+            class_name = current_instance.class_name
+            confidence_score = current_instance.confidence_score
+            label_text = f"{class_name}: {confidence_score :.3f}"
+            cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.3,
+                        color=(0, 0, 0), lineType=16)
+
+            # Mask
+            mask = current_instance.mask
+            if show_mask:
+                masked_image = apply_mask(masked_image, mask, color)
 
     return masked_image
 
@@ -542,3 +542,6 @@ def display_weight_stats(model):
                 "{:+9.4f}".format(w.std()),
             ])
     display_table(table)
+
+
+static_colors = random_colors(30)

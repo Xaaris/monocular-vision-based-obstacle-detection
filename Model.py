@@ -42,10 +42,10 @@ class DetectedObjects:
 
 @dataclass
 class Box:
-    center_x: float
-    center_y: float
-    width: float
-    height: float
+    x1: int
+    y1: int
+    x2: int
+    y2: int
 
 
 @dataclass
@@ -78,6 +78,12 @@ class ObjectInstance:
 @dataclass
 class ObjectTrack:
     occurrences: [ObjectInstance] = field(default_factory=list)
+
+    def is_present(self) -> bool:
+        return len(self.occurrences) > 0 and self.occurrences[-1] is not None
+
+    def get_current_instance(self) -> ObjectInstance:
+        return self.occurrences[-1] if self.is_present() else None
 
     def similarity_to(self, obj_instance) -> float:
         last_n_occurrences = self.occurrences[-5:]

@@ -1,6 +1,7 @@
-from Mask_R_CNN_COCO import detect, draw, get_class_name_for_id
+from Mask_R_CNN_COCO import detect, get_class_name_for_id
 from Model import ObjectInstance, Box, DetectedObjects
 from ORB import get_keypoints_and_descriptors_for_object
+from mrcnn import visualize
 from utils.image_utils import get_frames, save_debug_image
 from utils.timer import print_timing_results, timing
 
@@ -16,16 +17,7 @@ def create_objects(result) -> [ObjectInstance]:
 
         roi = result["rois"][i]
         y1, x1, y2, x2 = roi
-        width_in_pixel = x2 - x1
-        height_in_pixel = y2 - y1
-        center_x_in_pixel = x1 + width_in_pixel / 2
-        center_y_in_pixel = y1 + height_in_pixel / 2
-        frame_height_in_pixel, frame_width_in_pixel, _ = frame.shape
-        center_x_normalized = center_x_in_pixel / frame_width_in_pixel
-        center_y_normalized = center_y_in_pixel / frame_height_in_pixel
-        width_normalized = width_in_pixel / frame_width_in_pixel
-        height_normalized = height_in_pixel / frame_height_in_pixel
-        normalized_roi_box = Box(center_x_normalized, center_y_normalized, width_normalized, height_normalized)
+        normalized_roi_box = Box(x1, y1, x2, y2)
 
         confidence_score = result["scores"][i]
 
@@ -44,11 +36,12 @@ if __name__ == "__main__":
 
     for frame_number, frame in enumerate(get_frames(VIDEO_FILE, from_sec=1, to_sec=2)):
         result = detect(frame)
-        result_frame = draw(frame, result)
-        save_debug_image(result_frame, "frame_" + str(frame_number))
 
         newly_detected_objects = create_objects(result)
         detected_objects.add_objects(newly_detected_objects)
+
+        result_frame = visualize.draw_instances(frame, detected_objects)
+        save_debug_image(result_frame, "frame_" + str(frame_number))
 
         print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
 
