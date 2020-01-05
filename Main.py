@@ -5,8 +5,6 @@ from mrcnn import visualize
 from utils.image_utils import get_frames, save_debug_image
 from utils.timer import print_timing_results, timing
 
-VIDEO_FILE = "data/IMG_5823.mov"
-
 
 @timing
 def create_objects(result) -> [ObjectInstance]:
@@ -29,6 +27,8 @@ def create_objects(result) -> [ObjectInstance]:
         objects.append(detected_object)
     return objects
 
+
+VIDEO_FILE = "data/IMG_5823.mov"
 
 if __name__ == "__main__":
 

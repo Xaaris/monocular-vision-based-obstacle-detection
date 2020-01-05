@@ -221,6 +221,15 @@ def draw_instances(image,
             if show_mask:
                 masked_image = apply_mask(masked_image, mask, color)
 
+            # Trajectory
+            trajectory = obj.get_trajectory()
+            if trajectory:
+                width = box.x2 - box.x1
+                height = box.y2 - box.y1
+                center = (int(box.x1 + width / 2), int(box.y1 + height / 2))
+                arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))
+                cv2.arrowedLine(masked_image, center, arrow_head, (0, 0, 255), 2)
+
     return masked_image
 
 
