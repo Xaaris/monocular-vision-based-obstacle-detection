@@ -7,7 +7,7 @@ from cv2.cv2 import KeyPoint
 
 
 class DetectedObjects:
-    SAMENESS_THRESHHOLD = 0.5
+    SAMENESS_THRESHHOLD = 0.4
 
     objects = []
 
@@ -63,6 +63,15 @@ class Box:
     x2: int
     y2: int
 
+    def get_width(self) -> int:
+        return self.x2 - self.x1
+
+    def get_height(self) -> int:
+        return self.y2 - self.y1
+
+    def get_center(self) -> tuple:
+        return int(self.x1 + self.get_width() / 2), int(self.y1 + self.get_height() / 2)
+
 
 @dataclass
 class ObjectInstance:
@@ -79,6 +88,10 @@ class ObjectInstance:
         if not self.class_name == obj_instance.class_name:
             return 0
         if self.descriptors is None or obj_instance.descriptors is None:
+            return 0
+        this_center_x, this_center_y = self.roi.get_center()
+        other_center_x, other_center_y = obj_instance.roi.get_center()
+        if abs(this_center_x - other_center_x) > 100 or abs(this_center_y - other_center_y) > 100:
             return 0
         matches = self.matcher.match(self.descriptors, obj_instance.descriptors, None)
         # sum distances
@@ -130,15 +143,16 @@ class ObjectTrack:
                     # Remove not so good matches
                     num_good_matches = int(len(matches) * self.GOOD_MATCH_PERCENT)
                     matches = matches[:num_good_matches]
-                    for match in matches:
-                        kp_idx_current = match.queryIdx
-                        kp_idx_last = match.trainIdx
-                        key_point_current = current.keypoints[kp_idx_current].pt
-                        key_point_last = last.keypoints[kp_idx_last].pt
-                        translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
-                        cumulative_translation = tuple(map(operator.add, cumulative_translation, translation))  # add them up
-                    cumulative_translation = tuple(map(lambda x: x/len(matches), cumulative_translation))  # div by length
-            smoothed_translation = tuple(map(operator.add, smoothed_translation, cumulative_translation))  # add them up
+                    if matches:  # one or more matches
+                        for match in matches:
+                            kp_idx_current = match.queryIdx
+                            kp_idx_last = match.trainIdx
+                            key_point_current = current.keypoints[kp_idx_current].pt
+                            key_point_last = last.keypoints[kp_idx_last].pt
+                            translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
+                            cumulative_translation = tuple(map(operator.add, cumulative_translation, translation))  # add them up
+                        cumulative_translation = tuple(map(lambda x: x/len(matches), cumulative_translation))  # div by length
+                smoothed_translation = tuple(map(operator.add, smoothed_translation, cumulative_translation))  # add them up
             smoothed_translation = tuple(map(lambda x: x/over_n_instances, smoothed_translation))  # div by over_n_instances
             return smoothed_translation
 

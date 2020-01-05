@@ -4,6 +4,8 @@ import os
 import cv2.cv2 as cv2
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
+from utils.timer import timing
+
 
 def letterbox_image(image, desired_size):
     """resize image with unchanged aspect ratio using padding (width, height)"""
@@ -62,12 +64,13 @@ def get_image_patch_from_contour(image, contour):
     return cv2.getRectSubPix(image, size, center)
 
 
-def show(image, label="image"):
+def show(image, label="image", await_keypress=True):
     """Displays the image (optionally with a label) and halts the program until any key is pressed"""
     cv2.imshow(label, image)
-    cv2.waitKey()
+    cv2.waitKey() if await_keypress else cv2.waitKey(1)
 
 
+@timing
 def save_debug_image(image, filename, folder=None, resize_to=None):
     """
     Saves a given image under a specified filename.

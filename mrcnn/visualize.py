@@ -197,7 +197,7 @@ def draw_instances(image,
 
             current_instance = obj.get_current_instance()
 
-            color = static_colors[i]
+            color = static_colors[i % max_number_of_colors]
 
             # Bounding box
             if not np.any(current_instance.roi):
@@ -224,9 +224,7 @@ def draw_instances(image,
             # Trajectory
             trajectory = obj.get_trajectory()
             if trajectory:
-                width = box.x2 - box.x1
-                height = box.y2 - box.y1
-                center = (int(box.x1 + width / 2), int(box.y1 + height / 2))
+                center = box.get_center()
                 arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))
                 cv2.arrowedLine(masked_image, center, arrow_head, (0, 0, 255), 2)
 
@@ -553,4 +551,5 @@ def display_weight_stats(model):
     display_table(table)
 
 
-static_colors = random_colors(30)
+max_number_of_colors = 50
+static_colors = random_colors(max_number_of_colors)

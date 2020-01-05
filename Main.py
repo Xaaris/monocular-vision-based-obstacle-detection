@@ -2,7 +2,7 @@ from Mask_R_CNN_COCO import detect, get_class_name_for_id
 from Model import ObjectInstance, Box, DetectedObjects
 from ORB import get_keypoints_and_descriptors_for_object
 from mrcnn import visualize
-from utils.image_utils import get_frames, save_debug_image
+from utils.image_utils import get_frames, save_debug_image, show
 from utils.timer import print_timing_results, timing
 
 
@@ -34,7 +34,7 @@ if __name__ == "__main__":
 
     detected_objects = DetectedObjects()
 
-    for frame_number, frame in enumerate(get_frames(VIDEO_FILE, from_sec=1, to_sec=2)):
+    for frame_number, frame in enumerate(get_frames(VIDEO_FILE, from_sec=0, to_sec=4)):
         result = detect(frame)
 
         newly_detected_objects = create_objects(result)
@@ -44,5 +44,6 @@ if __name__ == "__main__":
         save_debug_image(result_frame, "frame_" + str(frame_number))
 
         print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
+        show(result_frame, f"Frame", await_keypress=False)
 
     print_timing_results()
