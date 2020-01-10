@@ -212,7 +212,8 @@ def draw_instances(image,
             # Label
             class_name = current_instance.class_name
             confidence_score = current_instance.confidence_score
-            label_text = f"{class_name}: {confidence_score :.3f}"
+            obj_track_id = obj.id
+            label_text = f"{class_name} {obj_track_id}: {confidence_score :.3f}"
             cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.3,
                         color=(0, 0, 0), lineType=16)
 

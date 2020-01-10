@@ -1,4 +1,5 @@
 """Miscellaneous utility functions for working with images"""
+import glob
 import os
 
 import cv2.cv2 as cv2
@@ -95,6 +96,18 @@ def get_frames(path_to_video, from_sec=0, to_sec=None):
         # We have to switch the order of channels as opencv has a different order as they are coming from the camera
         color_corrected_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         yield color_corrected_frame
+
+
+def get_frames_from_image_directory(path, image_type="png", from_image=0, to_image=None):
+    """
+    Generator that reads a directory of images from disk and yields a image at a time
+    """
+    fullpath = os.path.abspath(path)
+    image_paths = glob.glob(os.path.join(fullpath, '*.' + image_type))
+    image_paths.sort()
+    for image_path in image_paths[from_image:to_image]:
+        image = cv2.imread(image_path)
+        yield image
 
 
 def draw_rectangle(image, box, color=(0, 0, 255), thickness=2, offset=(0, 0)):
