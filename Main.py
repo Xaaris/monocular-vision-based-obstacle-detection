@@ -48,7 +48,7 @@ if __name__ == "__main__":
 
         print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
         # show(result_frame, "Frame", await_keypress=False)
-        # save_debug_image(result_frame, "frame_" + str(frame_number))
+        save_debug_image(result_frame, "frame_" + str(frame_number))
         output_video.write(result_frame)
 
     print_timing_results()

@@ -5,6 +5,7 @@ import numpy as np
 from cv2 import cv2
 from cv2.cv2 import KeyPoint
 
+LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
 SAMENESS_THRESHHOLD = 0.4
 GOOD_MATCH_PERCENT = 0.75
 
@@ -65,7 +66,7 @@ class ObjectInstance:
         # Check if instances are in similar location
         this_position_x, this_position_y = self.roi.get_position_in_image()
         other_position_x, other_position_y = obj_instance.roi.get_position_in_image()
-        if abs(this_position_x - other_position_x) > 0.2 or abs(this_position_y - other_position_y) > 0.2:
+        if abs(this_position_x - other_position_x) > LOCATION_VARIANCE_THRESHOLD or abs(this_position_y - other_position_y) > LOCATION_VARIANCE_THRESHOLD:
             return 0
         # Check if descriptors match
         average_distance = _average_descriptor_distance(self.descriptors, obj_instance.descriptors)
@@ -131,14 +132,15 @@ class DetectedObjects:
 
         touched_objects = []
         for new_obj in new_objects:
-            touched_objects.append(self.add_object(new_obj))
+            new_or_added_to_obj_track = self.add_object(new_obj, touched_objects)
+            touched_objects.append(new_or_added_to_obj_track)
 
         # add None to all obj_tracks that have not found a new instance
         for obj_track in self.objects:
             if obj_track not in touched_objects:
                 obj_track.occurrences.append(None)
 
-    def add_object(self, new_obj_instance, verbose=False):
+    def add_object(self, new_obj_instance, already_touched_obj_tracks, verbose=False):
 
         if verbose:
             print(f"\nNew Object: {new_obj_instance.class_name}, {new_obj_instance.roi}")
@@ -146,15 +148,16 @@ class DetectedObjects:
         obj_with_highest_similarity = None
         highest_similarity = 0
         for i, obj_track in enumerate(self.objects):
-            similarity_to_current_obj = obj_track.similarity_to(new_obj_instance)
-            if verbose:
-                if obj_track.is_present():
-                    print(f"Similarity to obj {i}: {similarity_to_current_obj:.3f}, {obj_track.get_current_instance().class_name}, {obj_track.get_current_instance().roi}")
-                else:
-                    print(f"Similarity to obj {i}: {similarity_to_current_obj:.3f}, Not present in current frame")
-            if similarity_to_current_obj > highest_similarity:
-                highest_similarity = similarity_to_current_obj
-                obj_with_highest_similarity = obj_track
+            if obj_track not in already_touched_obj_tracks:
+                similarity_to_current_obj = obj_track.similarity_to(new_obj_instance)
+                if verbose:
+                    if obj_track.is_present():
+                        print(f"Similarity to obj {i}: {similarity_to_current_obj:.3f}, {obj_track.get_current_instance().class_name}, {obj_track.get_current_instance().roi}")
+                    else:
+                        print(f"Similarity to obj {i}: {similarity_to_current_obj:.3f}, Not present in current frame")
+                if similarity_to_current_obj > highest_similarity:
+                    highest_similarity = similarity_to_current_obj
+                    obj_with_highest_similarity = obj_track
 
         if highest_similarity > SAMENESS_THRESHHOLD:
             if verbose:
