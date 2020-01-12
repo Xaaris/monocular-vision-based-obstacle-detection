@@ -17,7 +17,7 @@ if __name__ == "__main__":
     detected_objects = DetectedObjects()
 
     # for frame_number, frame in enumerate(get_frames_from_image_directory("data/Interesting Kitti frame sets/Mostly static camera/0010", from_image=0, to_image=100)):
-    for frame_number, frame in enumerate(get_frames(video_path, from_sec=0, to_sec=3)):
+    for frame_number, frame in enumerate(get_frames(video_path, from_sec=1, to_sec=3)):
         result = detect(frame)
 
         newly_detected_objects = create_objects(result, frame)

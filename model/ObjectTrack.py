@@ -44,6 +44,9 @@ class ObjectTrack:
                             translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
                             cumulative_translation = tuple(map(operator.add, cumulative_translation, translation))  # add them up
                         cumulative_translation = tuple(map(lambda x: x/len(matches), cumulative_translation))  # div by length
-                smoothed_translation = tuple(map(operator.add, smoothed_translation, cumulative_translation))  # add them up
+
+                decayed_translation = tuple(map(lambda x: x/(i + 1), cumulative_translation))  # decay: less impact for older instances
+                smoothed_translation = tuple(map(operator.add, smoothed_translation, decayed_translation))  # add them up
+
             smoothed_translation = tuple(map(lambda x: x/over_n_instances, smoothed_translation))  # div by over_n_instances
             return smoothed_translation

@@ -10,7 +10,7 @@ from utils.image_utils import show
 from utils.timer import timing
 
 LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
-
+CONFIDENCE_SCORE_THRESHOLD = 0.8  # Only objects with higher confidence are taken into account
 
 @dataclass
 class ObjectInstance:
@@ -45,18 +45,20 @@ def create_objects(result, frame) -> [ObjectInstance]:
     objects = []
     number_of_results = result["class_ids"].shape[0]
     for i in range(number_of_results):
-        class_name = get_class_name_for_id(result["class_ids"][i])
-
-        roi = result["rois"][i]
-        y1, x1, y2, x2 = roi
-        box = Box(x1, y1, x2, y2)
 
         confidence_score = result["scores"][i]
+        if confidence_score > CONFIDENCE_SCORE_THRESHOLD:  # filter objects
+            class_name = get_class_name_for_id(result["class_ids"][i])
 
-        mask = result["masks"][:, :, i]
+            roi = result["rois"][i]
+            y1, x1, y2, x2 = roi
+            box = Box(x1, y1, x2, y2)
 
-        keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame, mask)
-        # show(drawKeypoints(frame, keypoints, None))
-        detected_object = ObjectInstance(class_name, box, confidence_score, mask, keypoints, descriptors)
-        objects.append(detected_object)
+            mask = result["masks"][:, :, i]
+
+            keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame, mask)
+            # show(drawKeypoints(frame, keypoints, None))
+            detected_object = ObjectInstance(class_name, box, confidence_score, mask, keypoints, descriptors)
+            objects.append(detected_object)
+
     return objects
