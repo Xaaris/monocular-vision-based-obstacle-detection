@@ -21,7 +21,8 @@ from matplotlib import patches, lines
 from matplotlib.patches import Polygon
 from skimage.measure import find_contours
 
-from Model import DetectedObjects, Box
+from model.Box import Box
+from model.DetectedObjects import DetectedObjects
 from utils.timer import timing
 
 # Root directory of the project
