@@ -5,10 +5,11 @@ MAX_FEATURES = 200
 orb = cv2.ORB_create(MAX_FEATURES)
 
 MATCHER = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+CROSS_CHECK_MATCHER = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)  # Makes sure matches match both ways: min(desca, descb)
 
 
 def get_matches(descriptor_a, descriptor_b, max_distance):
-    matches = MATCHER.match(descriptor_a, descriptor_b, None)
+    matches = CROSS_CHECK_MATCHER.match(descriptor_a, descriptor_b, None)
     filtered_matches = list(filter(lambda m: m.distance <= max_distance, matches))
     return filtered_matches
 

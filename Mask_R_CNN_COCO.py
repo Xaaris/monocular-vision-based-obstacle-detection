@@ -27,8 +27,8 @@ class InferenceConfig(CocoConfig):
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    IMAGE_MIN_DIM = 375
-    IMAGE_MAX_DIM = 1280  # TODO: experiment with results and timing to see if its worth to lower this
+    IMAGE_MIN_DIM = 360
+    IMAGE_MAX_DIM = 640  # TODO: experiment with results and timing to see if its worth to lower this
 
 
 config = InferenceConfig()

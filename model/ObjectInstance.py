@@ -1,11 +1,12 @@
 from dataclasses import dataclass, field
 
 import numpy as np
-from cv2.cv2 import KeyPoint
+from cv2.cv2 import KeyPoint, drawKeypoints
 
 from Mask_R_CNN_COCO import get_class_name_for_id
 from ORB import get_keypoints_and_descriptors_for_object, average_descriptor_distance
 from model.Box import Box
+from utils.image_utils import show
 from utils.timer import timing
 
 LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
@@ -55,7 +56,7 @@ def create_objects(result, frame) -> [ObjectInstance]:
         mask = result["masks"][:, :, i]
 
         keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame, mask)
-
+        # show(drawKeypoints(frame, keypoints, None))
         detected_object = ObjectInstance(class_name, box, confidence_score, mask, keypoints, descriptors)
         objects.append(detected_object)
     return objects

@@ -1,7 +1,7 @@
 from model.IdGenerator import get_next_id_for
 from model.ObjectTrack import ObjectTrack
 
-SAMENESS_THRESHOLD = 0.4
+SAMENESS_THRESHOLD = 0.3  # 0 = match all, 1 match basically none
 
 
 class DetectedObjects:
