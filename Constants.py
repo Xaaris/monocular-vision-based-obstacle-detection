@@ -9,6 +9,7 @@ class InputDataType(Enum):
 class MatcherType(Enum):
     SIFT = "Sift"
     ORB = "Orb"
+    SURF = "Surf"
 
 
 VIDEO_FILE = "IMG_5823"
@@ -21,7 +22,7 @@ INPUT_DIMENSIONS = (1242, 375)
 FPS = 10
 FROM_SEC_OR_IMAGE = 0
 TO_SEC_OR_IMAGE = 12
-MATCHER_TYPE = MatcherType.ORB
+MATCHER_TYPE = MatcherType.SURF
 
 FILE_PATH = (VIDEO_PATH + VIDEO_FILE + VIDEO_FORMAT) if INPUT_DATA_TYPE == InputDataType.VIDEO else (IMAGE_SET_PATH + IMAGE_DIRECTORY)
 

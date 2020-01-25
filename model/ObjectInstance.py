@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+import cv2
 import numpy as np
 from cv2.cv2 import KeyPoint
 
@@ -8,6 +9,8 @@ from mrcnn.Mask_R_CNN_COCO import get_class_name_for_id
 from Constants import MATCHER_TYPE, MatcherType
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
+elif MATCHER_TYPE == MatcherType.SURF:
+    from matcher.SurfMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 else:
     from matcher.OrbMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 
@@ -49,6 +52,10 @@ class ObjectInstance:
 def create_objects(result, frame) -> [ObjectInstance]:
     objects = []
     number_of_results = result["class_ids"].shape[0]
+
+    # Convert frame to grayscale for matchers
+    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
     for i in range(number_of_results):
 
         confidence_score = result["scores"][i]
@@ -61,7 +68,7 @@ def create_objects(result, frame) -> [ObjectInstance]:
 
             mask = result["masks"][:, :, i]
 
-            keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame, mask)
+            keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame_gray, mask)
             # show(drawKeypoints(frame, keypoints, None))
             detected_object = ObjectInstance(class_name, box, confidence_score, mask, keypoints, descriptors)
             objects.append(detected_object)

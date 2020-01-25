@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from Constants import MATCHER_TYPE, MatcherType
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
+elif MATCHER_TYPE == MatcherType.SURF:
+    from matcher.SurfMatcher import get_matches
 else:
     from matcher.OrbMatcher import get_matches
 

@@ -24,11 +24,9 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     return total_distance / len(matches)
 
 
-def get_keypoints_and_descriptors_for_object(image, mask):
-    # Convert image to grayscale
-    img_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
 
     mask_int = np.copy(mask).astype(np.uint8)
 
     # Detect ORB features and compute descriptors.
-    return ORB.detectAndCompute(img_gray, mask_int)
+    return ORB.detectAndCompute(graysclae_image, mask_int)
