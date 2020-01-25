@@ -1,7 +1,12 @@
 import operator
 from dataclasses import dataclass, field
 
-from matcher.SiftMatcher import get_matches
+from Constants import MATCHER_TYPE, MatcherType
+if MATCHER_TYPE == MatcherType.SIFT:
+    from matcher.SiftMatcher import get_matches
+else:
+    from matcher.OrbMatcher import get_matches
+
 from model.ObjectInstance import ObjectInstance
 
 

@@ -160,6 +160,6 @@ def draw_processed_image(frame):
 def prepare_video_output() -> VideoWriter:
     output_identifier = VIDEO_FILE if INPUT_DATA_TYPE == InputDataType.VIDEO else IMAGE_DIRECTORY
     output_identifier = output_identifier.replace("/", "_")
-    output_file_path = "out/out_" + output_identifier + "_" + str(FROM_SEC_OR_IMAGE) + "_to_" + str(TO_SEC_OR_IMAGE) + VIDEO_FORMAT
+    output_file_path = "out/out_" + output_identifier + "_" + MATCHER_TYPE.value + "_" + str(FROM_SEC_OR_IMAGE) + "_to_" + str(TO_SEC_OR_IMAGE) + VIDEO_FORMAT
     video_writer = cv2.VideoWriter(output_file_path, cv2.VideoWriter_fourcc("X", "V", "I", "D"), FPS, INPUT_DIMENSIONS, True)
     return video_writer

@@ -4,7 +4,13 @@ import numpy as np
 from cv2.cv2 import KeyPoint
 
 from mrcnn.Mask_R_CNN_COCO import get_class_name_for_id
-from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
+
+from Constants import MATCHER_TYPE, MatcherType
+if MATCHER_TYPE == MatcherType.SIFT:
+    from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
+else:
+    from matcher.OrbMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
+
 from model.Box import Box
 from utils.timer import timing
 
