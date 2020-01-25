@@ -6,8 +6,6 @@ import cv2.cv2 as cv2
 from cv2.cv2 import VideoWriter
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from utils.timer import timing
-
 
 def letterbox_image(image, desired_size):
     """resize image with unchanged aspect ratio using padding (width, height)"""
@@ -72,8 +70,7 @@ def show(image, label="image", await_keypress=True):
     cv2.waitKey() if await_keypress else cv2.waitKey(1)
 
 
-@timing
-def save_debug_image(image, filename, folder=None, resize_to=None):
+async def save_debug_image(image, filename, folder=None, resize_to=None):
     """
     Saves a given image under a specified filename.
     Optionally within a folder and resizing it (width, height)

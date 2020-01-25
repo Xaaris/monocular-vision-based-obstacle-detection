@@ -4,6 +4,7 @@ from model.ObjectInstance import create_objects
 from mrcnn import visualize
 from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames
 from utils.timer import print_timing_results
+import asyncio
 
 
 VIDEO_FILE = "IMG_5823"
@@ -35,7 +36,7 @@ if __name__ == "__main__":
 
         print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
         show(result_frame, "Frame", await_keypress=False)
-        save_debug_image(result_frame, "frame_" + str(frame_number))
+        asyncio.run(save_debug_image(result_frame, "frame_" + str(frame_number)))
         output_video.write(result_frame)
 
     print_timing_results()
