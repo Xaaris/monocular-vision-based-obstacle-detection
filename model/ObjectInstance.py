@@ -4,7 +4,7 @@ import numpy as np
 from cv2.cv2 import KeyPoint, drawKeypoints
 
 from Mask_R_CNN_COCO import get_class_name_for_id
-from ORB import get_keypoints_and_descriptors_for_object, average_descriptor_distance
+from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 from model.Box import Box
 from utils.image_utils import show
 from utils.timer import timing

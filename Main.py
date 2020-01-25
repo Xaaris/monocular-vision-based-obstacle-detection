@@ -2,22 +2,30 @@ from Mask_R_CNN_COCO import detect
 from model.DetectedObjects import DetectedObjects
 from model.ObjectInstance import create_objects
 from mrcnn import visualize
-from utils.image_utils import save_debug_image, get_frames_from_image_directory, show, get_frames
+from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames
 from utils.timer import print_timing_results
-import cv2
 
 
-video_file = "IMG_5823.mov"
-video_path = "data/" + video_file
-INPUT_IMAGE_DIMENSIONS = (640, 360)
-output_video = cv2.VideoWriter("out/out_" + video_file, cv2.VideoWriter_fourcc("X", "V", "I", "D"), 10, INPUT_IMAGE_DIMENSIONS)
+VIDEO_FILE = "IMG_5823"
+VIDEO_FORMAT = ".mov"
+IMAGE_DIRECTORY = "static/0010"
+VIDEO_PATH = "data/video/"
+IMAGE_SET_PATH = "data/imageSet/"
+INPUT_DATA_TYPE = "image"  # video or image
+INPUT_DIMENSIONS = (1242, 375)
+FPS = 10
+FROM_SEC_OR_IMAGE = 0
+TO_SEC_OR_IMAGE = 12
+
+file_path = (VIDEO_PATH + VIDEO_FILE + VIDEO_FORMAT) if INPUT_DATA_TYPE == "video" else (IMAGE_SET_PATH + IMAGE_DIRECTORY)
+
+output_video = prepare_video_output(INPUT_DATA_TYPE, VIDEO_FORMAT, VIDEO_FILE, IMAGE_DIRECTORY, INPUT_DIMENSIONS, FPS, FROM_SEC_OR_IMAGE, TO_SEC_OR_IMAGE)
 
 if __name__ == "__main__":
 
     detected_objects = DetectedObjects()
 
-    # for frame_number, frame in enumerate(get_frames_from_image_directory("data/Interesting Kitti frame sets/Mostly static camera/0010", from_image=0, to_image=100)):
-    for frame_number, frame in enumerate(get_frames(video_path, from_sec=1, to_sec=3)):
+    for frame_number, frame in enumerate(get_frames(INPUT_DATA_TYPE, file_path, FROM_SEC_OR_IMAGE, TO_SEC_OR_IMAGE)):
         result = detect(frame)
 
         newly_detected_objects = create_objects(result, frame)

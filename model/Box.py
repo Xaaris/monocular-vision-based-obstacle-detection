@@ -18,5 +18,5 @@ class Box:
         return int(self.x1 + self.get_width() / 2), int(self.y1 + self.get_height() / 2)
 
     def get_position_in_image(self) -> tuple:
-        from Main import INPUT_IMAGE_DIMENSIONS
-        return self.get_center()[0] / INPUT_IMAGE_DIMENSIONS[0], self.get_center()[1] / INPUT_IMAGE_DIMENSIONS[1]
+        from Main import INPUT_DIMENSIONS
+        return self.get_center()[0] / INPUT_DIMENSIONS[0], self.get_center()[1] / INPUT_DIMENSIONS[1]

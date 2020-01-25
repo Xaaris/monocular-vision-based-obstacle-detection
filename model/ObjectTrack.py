@@ -1,7 +1,7 @@
 import operator
 from dataclasses import dataclass, field
 
-from ORB import get_matches
+from matcher.SiftMatcher import get_matches
 from model.ObjectInstance import ObjectInstance
 
 
@@ -34,7 +34,7 @@ class ObjectTrack:
 
                 cumulative_translation = (0, 0)
                 if current is not None and current.descriptors is not None and last is not None and last.descriptors is not None:
-                    matches = get_matches(current.descriptors, last.descriptors, max_distance=50)
+                    matches = get_matches(current.descriptors, last.descriptors)
                     if matches:  # one or more matches
                         for match in matches:
                             kp_idx_current = match.queryIdx

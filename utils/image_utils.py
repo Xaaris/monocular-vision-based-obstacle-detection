@@ -3,6 +3,7 @@ import glob
 import os
 
 import cv2.cv2 as cv2
+from cv2.cv2 import VideoWriter
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
 from utils.timer import timing
@@ -86,7 +87,16 @@ def save_debug_image(image, filename, folder=None, resize_to=None):
     cv2.imwrite(path, image)
 
 
-def get_frames(path_to_video, from_sec=0, to_sec=None):
+def get_frames(input_type, path, from_sec_or_image=0, to_sec_or_image=None):
+    if input_type == "video":
+        return get_frames_from_video(path, from_sec_or_image, to_sec_or_image)
+    elif input_type == "image":
+        return get_frames_from_image_directory(path, from_image=from_sec_or_image, to_image=to_sec_or_image)
+    else:
+        raise Exception("Unknown input_type")
+
+
+def get_frames_from_video(path_to_video, from_sec=0, to_sec=None):
     """
     Generator that reads a video file from disk and yields a color correct frame at a time
     """
@@ -146,3 +156,11 @@ def draw_processed_image(frame):
                 color = (0, 0, 200)
             draw_rectangle(image_copy, plate.box, color=color, offset=(v_top, v_left))
     return image_copy
+
+
+def prepare_video_output(input_data_type, video_format,  video_file, image_directory, input_dimensions, fps, from_sec_or_image, to_sec_or_image) -> VideoWriter:
+    output_identifier = video_file if input_data_type == "video" else image_directory
+    output_identifier = output_identifier.replace("/", "_")
+    output_file_path = "out/out_" + output_identifier + "_" + str(from_sec_or_image) + "_to_" + str(to_sec_or_image) + video_format
+    video_writer = cv2.VideoWriter(output_file_path, cv2.VideoWriter_fourcc("X", "V", "I", "D"), fps, input_dimensions, True)
+    return video_writer
