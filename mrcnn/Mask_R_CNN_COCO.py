@@ -88,4 +88,5 @@ def detect(image):
     # Run detection
     results = model.detect([image], verbose=0)
 
+    # ignore batch dimension
     return results[0]
