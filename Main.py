@@ -1,4 +1,4 @@
-from Mask_R_CNN_COCO import detect
+from mrcnn.Mask_R_CNN_COCO import detect
 from model.DetectedObjects import DetectedObjects
 from model.ObjectInstance import create_objects
 from mrcnn import visualize

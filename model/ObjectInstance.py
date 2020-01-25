@@ -1,12 +1,11 @@
 from dataclasses import dataclass, field
 
 import numpy as np
-from cv2.cv2 import KeyPoint, drawKeypoints
+from cv2.cv2 import KeyPoint
 
-from Mask_R_CNN_COCO import get_class_name_for_id
+from mrcnn.Mask_R_CNN_COCO import get_class_name_for_id
 from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 from model.Box import Box
-from utils.image_utils import show
 from utils.timer import timing
 
 LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
