@@ -4,7 +4,7 @@ import numpy as np
 HESSIAN_THRESHOLD = 400
 SURF = cv2.xfeatures2d.SURF_create(HESSIAN_THRESHOLD, upright=True)
 
-SIMPLE_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+KNN_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
 
 
 def get_matches(descriptor_a, descriptor_b, max_distance=0.3):
@@ -35,7 +35,7 @@ def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
 
 
 def _get_matches(descriptor_a, descriptor_b):
-    knn_matches = SIMPLE_DESCRIPTOR_MATCHER.knnMatch(descriptor_a, descriptor_b, 2)
+    knn_matches = KNN_DESCRIPTOR_MATCHER.knnMatch(descriptor_a, descriptor_b, 2)
 
     # D. Lowe's ration test (https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)
     ratio_thresh = 0.7

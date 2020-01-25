@@ -12,20 +12,21 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 
 
 def get_matches(descriptor_a, descriptor_b, max_distance=100):
-    matches = flann.knnMatch(descriptor_a, descriptor_b, k=1)
-    matches_with_at_least_one_hit = list(filter(lambda m: len(m) > 0, matches))
-    unpacked_matches = [m[0] for m in matches_with_at_least_one_hit]
-    filtered_matches = list(filter(lambda m: m.distance <= max_distance, unpacked_matches))
+    matches = _get_matches(descriptor_a, descriptor_b)
+    filtered_matches = list(filter(lambda m: m.distance <= max_distance, matches))
     return filtered_matches
 
 
 def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
-    matches = flann.knnMatch(descriptor_a, descriptor_b, k=1)
-    matches_with_at_least_one_hit = list(filter(lambda m: len(m) > 0, matches))
+    # make sure that number of features in both test and query image is greater than or equal to number of nearest neighbors in knn match.
+    if len(descriptor_a) < 2 or len(descriptor_b) < 2:
+        return 100
+
+    matches = _get_matches(descriptor_a, descriptor_b)
     # sum distances
-    total_distance = sum([m[0].distance for m in matches_with_at_least_one_hit])
+    total_distance = sum([m.distance for m in matches])
     # divide by number of matches
-    return (total_distance / len(matches)) / 10
+    return (total_distance / len(matches)) / 10 if len(matches) > 0 else 100
 
 
 def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
@@ -34,3 +35,15 @@ def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
 
     # Detect Sift features and compute descriptors.
     return SIFT.detectAndCompute(graysclae_image, mask_int)
+
+
+def _get_matches(descriptor_a, descriptor_b):
+    knn_matches = flann.knnMatch(descriptor_a, descriptor_b, 2)
+
+    # D. Lowe's ration test (https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)
+    ratio_thresh = 0.7
+    good_matches = []
+    for m, n in knn_matches:
+        if m.distance < ratio_thresh * n.distance:
+            good_matches.append(m)
+    return good_matches
