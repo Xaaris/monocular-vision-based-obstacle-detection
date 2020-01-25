@@ -1,12 +1,11 @@
 import os
 
 import mrcnn.model as modellib
-# Import COCO config
-from coco.coco import CocoConfig
 # Import Mask RCNN
 from mrcnn import utils
 
 # Local path to trained weights file
+from mrcnn.config import Config
 from utils.timer import timing
 
 COCO_MODEL_PATH = "weights/mask_rcnn_coco.h5"
@@ -17,10 +16,29 @@ if not os.path.exists(COCO_MODEL_PATH):
 
 # ## Configurations
 #
-# We'll be using a model trained on the MS-COCO dataset. The configurations of this model are in the ```CocoConfig``` class in ```coco.py```.
+# We'll be using a model trained on the MS-COCO dataset. The configurations of this model are in the ```CocoConfig``` class.
 #
 # For inferencing, modify the configurations a bit to fit the task. To do so, sub-class the ```CocoConfig``` class and override the attributes you need to change.
 #
+
+class CocoConfig(Config):
+    """Configuration for training on MS COCO.
+    Derives from the base Config class and overrides values specific
+    to the COCO dataset.
+    """
+    # Give the configuration a recognizable name
+    NAME = "coco"
+
+    # We use a GPU with 12GB memory, which can fit two images.
+    # Adjust down if you use a smaller GPU.
+    IMAGES_PER_GPU = 2
+
+    # Uncomment to train on 8 GPUs (default is 1)
+    # GPU_COUNT = 8
+
+    # Number of classes (including background)
+    NUM_CLASSES = 1 + 80  # COCO has 80 classes
+
 
 class InferenceConfig(CocoConfig):
     # Set batch size to 1 since we'll be running inference on
