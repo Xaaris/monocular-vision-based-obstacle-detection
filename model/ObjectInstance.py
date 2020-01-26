@@ -50,12 +50,19 @@ class ObjectInstance:
         return max(0.0, 1 - normalized_distance)
 
     def approximate_distance(self) -> float:
-        dim_x, dim_y = get_dimensions(self.class_name)
-        lens_factor = CAMERA_TYPE.value / VIDEO_SCALE
-        approx_distance_x = (dim_x * lens_factor) / self.roi.get_width()
-        approx_distance_y = (dim_y * lens_factor) / self.roi.get_height()
-        approx_distance_in_cm = (approx_distance_x + approx_distance_y) / 2
-        return approx_distance_in_cm
+        rl_dim_x, rl_dim_y = get_dimensions(self.class_name)
+        lens_factor = CAMERA_TYPE.value * VIDEO_SCALE
+        bbox = self.roi
+        if not bbox.out_of_frame_left() and not bbox.out_of_frame_right():
+            approx_distance_x = (rl_dim_x * lens_factor) / bbox.get_width()
+        else:
+            approx_distance_x = 0  # bbox goes out of frame horizontally
+        if not bbox.out_of_frame_top() and not bbox.out_of_frame_bottom():
+            approx_distance_y = (rl_dim_y * lens_factor) / bbox.get_height()
+        else:
+            approx_distance_y = 0  # bbox goes out of frame vertically
+        approx_distance_in_m = max(approx_distance_x, approx_distance_y)
+        return approx_distance_in_m
 
 
 @timing

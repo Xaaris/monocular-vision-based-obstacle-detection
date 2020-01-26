@@ -20,3 +20,15 @@ class Box:
 
     def get_position_in_image(self) -> tuple:
         return self.get_center()[0] / INPUT_DIMENSIONS[0], self.get_center()[1] / INPUT_DIMENSIONS[1]
+
+    def out_of_frame_left(self) -> bool:
+        return self.x1 < 5
+
+    def out_of_frame_right(self) -> bool:
+        return self.x2 > INPUT_DIMENSIONS[0] - 5
+
+    def out_of_frame_top(self) -> bool:
+        return self.y1 < 5
+
+    def out_of_frame_bottom(self) -> bool:
+        return self.y2 > INPUT_DIMENSIONS[1] - 5
