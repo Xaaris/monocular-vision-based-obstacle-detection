@@ -4,9 +4,10 @@ import cv2
 import numpy as np
 from cv2.cv2 import KeyPoint
 
-from mrcnn.Mask_R_CNN_COCO import get_class_name_for_id
+from mrcnn.CocoClasses import get_class_name_for_id, get_dimensions
 
-from Constants import MATCHER_TYPE, MatcherType
+from Constants import MATCHER_TYPE, MatcherType, CAMERA_TYPE, VIDEO_SCALE
+
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 elif MATCHER_TYPE == MatcherType.SURF:
@@ -47,6 +48,14 @@ class ObjectInstance:
         average_distance = average_descriptor_distance(self.descriptors, obj_instance.descriptors)
         normalized_distance = average_distance / 100  # normalize?
         return max(0.0, 1 - normalized_distance)
+
+    def approximate_distance(self) -> float:
+        dim_x, dim_y = get_dimensions(self.class_name)
+        lens_factor = CAMERA_TYPE.value / VIDEO_SCALE
+        approx_distance_x = (dim_x * lens_factor) / self.roi.get_width()
+        approx_distance_y = (dim_y * lens_factor) / self.roi.get_height()
+        approx_distance_in_cm = (approx_distance_x + approx_distance_y) / 2
+        return approx_distance_in_cm
 
 
 @timing

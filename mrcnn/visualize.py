@@ -88,10 +88,11 @@ def draw_instances(image,
             # Label
             class_name = current_instance.class_name
             confidence_score = current_instance.confidence_score
+            approximate_distance_in_m = current_instance.approximate_distance() / 100
             obj_track_id = obj.id
-            label_text = f"{class_name} {obj_track_id}: {confidence_score :.3f}"
-            cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.3,
-                        color=(0, 0, 0), lineType=16)
+            label_text = f"{class_name} {obj_track_id}: {approximate_distance_in_m :.3f}m"
+            cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
+                        color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
             # Mask
             mask = current_instance.mask
