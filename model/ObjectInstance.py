@@ -20,6 +20,7 @@ from utils.timer import timing
 LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
 CONFIDENCE_SCORE_THRESHOLD = 0.8  # Only objects with higher confidence are taken into account
 
+
 @dataclass
 class ObjectInstance:
     class_name: str

@@ -1,3 +1,4 @@
+import os
 from enum import Enum
 
 
@@ -22,7 +23,9 @@ INPUT_DIMENSIONS = (1242, 375)
 FPS = 10
 FROM_SEC_OR_IMAGE = 0
 TO_SEC_OR_IMAGE = 12
-MATCHER_TYPE = MatcherType.SURF
+MATCHER_TYPE = MatcherType.SIFT
 
 FILE_PATH = (VIDEO_PATH + VIDEO_FILE + VIDEO_FORMAT) if INPUT_DATA_TYPE == InputDataType.VIDEO else (IMAGE_SET_PATH + IMAGE_DIRECTORY)
+
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
