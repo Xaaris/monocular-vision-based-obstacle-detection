@@ -1,6 +1,5 @@
 """Miscellaneous utility functions for working with images"""
 import glob
-import os
 
 import cv2.cv2 as cv2
 from cv2.cv2 import VideoWriter
@@ -137,24 +136,6 @@ def draw_rectangle(image, box, color=(0, 0, 255), thickness=2, offset=(0, 0)):
     bottom += offset_y
 
     cv2.rectangle(image, (left, top), (right, bottom), color, thickness)
-
-
-def draw_processed_image(frame):
-    """Draws information found in the frame onto the image and returns it:
-    - Box around found vehicles
-    - Valid plates marked in green, invalid ones in red
-    """
-    image_copy = frame.image
-    for vehicle in frame.vehicles:
-        draw_rectangle(image_copy, vehicle.box)
-        for plate in vehicle.plates:
-            v_top, v_left, _, _ = vehicle.box
-            if plate.valid:
-                color = (0, 255, 0)
-            else:
-                color = (0, 0, 200)
-            draw_rectangle(image_copy, plate.box, color=color, offset=(v_top, v_left))
-    return image_copy
 
 
 def prepare_video_output() -> VideoWriter:
