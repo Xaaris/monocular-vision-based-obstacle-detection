@@ -83,7 +83,7 @@ def create_objects(result, frame) -> [ObjectInstance]:
             y1, x1, y2, x2 = roi
             box = Box(x1, y1, x2, y2)
 
-            mask = result["masks"][:, :, i]
+            mask = result["masks"][:, :, i].astype(np.uint8)
 
             keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame_gray, mask)
             # show(drawKeypoints(frame, keypoints, None))

@@ -1,5 +1,6 @@
 import cv2
-import numpy as np
+
+from utils.timer import timing
 
 SIFT = cv2.xfeatures2d.SIFT_create()
 
@@ -11,12 +12,14 @@ search_params = dict(checks=50)  # or pass empty dictionary
 flann = cv2.FlannBasedMatcher(index_params, search_params)
 
 
+@timing
 def get_matches(descriptor_a, descriptor_b, max_distance=100):
     matches = _get_matches(descriptor_a, descriptor_b)
     filtered_matches = list(filter(lambda m: m.distance <= max_distance, matches))
     return filtered_matches
 
 
+@timing
 def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     # make sure that number of features in both test and query image is greater than or equal to number of nearest neighbors in knn match.
     if len(descriptor_a) < 2 or len(descriptor_b) < 2:
@@ -29,12 +32,10 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     return (total_distance / len(matches)) / 10 if len(matches) > 0 else 100
 
 
+@timing
 def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
-
-    mask_int = np.copy(mask).astype(np.uint8)
-
     # Detect Sift features and compute descriptors.
-    return SIFT.detectAndCompute(graysclae_image, mask_int)
+    return SIFT.detectAndCompute(graysclae_image, mask)
 
 
 def _get_matches(descriptor_a, descriptor_b):

@@ -1,5 +1,6 @@
 import cv2
-import numpy as np
+
+from utils.timer import timing
 
 MAX_FEATURES = 200
 ORB = cv2.ORB_create(MAX_FEATURES)
@@ -10,12 +11,14 @@ SIMPLE_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_
 CROSS_CHECK_DESCRIPTOR_MATCHER = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 
+@timing
 def get_matches(descriptor_a, descriptor_b, max_distance=30):
     matches = CROSS_CHECK_DESCRIPTOR_MATCHER.match(descriptor_a, descriptor_b, None)
     filtered_matches = list(filter(lambda m: m.distance <= max_distance, matches))
     return filtered_matches
 
 
+@timing
 def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     matches = SIMPLE_DESCRIPTOR_MATCHER.match(descriptor_a, descriptor_b, None)
     # sum distances
@@ -24,9 +27,7 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     return total_distance / len(matches)
 
 
+@timing
 def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
-
-    mask_int = np.copy(mask).astype(np.uint8)
-
     # Detect ORB features and compute descriptors.
-    return ORB.detectAndCompute(graysclae_image, mask_int)
+    return ORB.detectAndCompute(graysclae_image, mask)

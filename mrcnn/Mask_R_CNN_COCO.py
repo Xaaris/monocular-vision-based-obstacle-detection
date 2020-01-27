@@ -2,7 +2,7 @@ import os
 
 import mrcnn.model as modellib
 # Import Mask RCNN
-from Constants import ROOT_DIR
+from Constants import ROOT_DIR, INPUT_DIMENSIONS
 from mrcnn import utils
 
 # Local path to trained weights file
@@ -41,13 +41,22 @@ class CocoConfig(Config):
     NUM_CLASSES = 1 + 80  # COCO has 80 classes
 
 
+def find_closest_acceptable_number(number):
+    # find closest number which is four times divisible by 2
+    if number % 16 == 0:
+        return number
+    else:
+        multiplier = round(number / 16)
+        return 16 * multiplier
+
+
 class InferenceConfig(CocoConfig):
     # Set batch size to 1 since we'll be running inference on
     # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    IMAGE_MIN_DIM = 360
-    IMAGE_MAX_DIM = 1280  # TODO: experiment with results and timing to see if its worth to lower this
+    IMAGE_MIN_DIM = find_closest_acceptable_number(min(INPUT_DIMENSIONS))
+    IMAGE_MAX_DIM = find_closest_acceptable_number(max(INPUT_DIMENSIONS))  # TODO: experiment with results and timing to see if its worth to lower this
 
 
 config = InferenceConfig()
