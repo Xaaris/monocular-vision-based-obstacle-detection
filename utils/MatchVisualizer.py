@@ -36,7 +36,7 @@ if __name__ == "__main__":
     detected_objects.add_objects(objects_1)
     detected_objects.add_objects(objects_2)
 
-    for detected_object in detected_objects.objects:
+    for obj_id, detected_object in detected_objects.objects.items():
         if len(detected_object.occurrences) == 2 \
                 and detected_object.occurrences[0] is not None \
                 and detected_object.occurrences[1] is not None:

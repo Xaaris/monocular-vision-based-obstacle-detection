@@ -66,14 +66,13 @@ def draw_instances(image,
     number_of_objects = len(detected_objects.objects)
 
     masked_image = image.copy()
-    for i in range(number_of_objects):
-        obj = detected_objects.objects[i]
+    for obj_id, obj_track in detected_objects.objects.items():
 
-        if obj.is_present():
+        if obj_track.is_present():
 
-            current_instance = obj.get_current_instance()
+            current_instance = obj_track.get_current_instance()
 
-            color = static_colors[i % max_number_of_colors]
+            color = static_colors[obj_id % max_number_of_colors]
 
             # Bounding box
             if not np.any(current_instance.roi):
@@ -89,8 +88,7 @@ def draw_instances(image,
             class_name = current_instance.class_name
             confidence_score = current_instance.confidence_score
             approximate_distance_in_m = current_instance.approximate_distance()
-            obj_track_id = obj.id
-            label_text = f"{class_name} {obj_track_id}: {approximate_distance_in_m :.1f}m"
+            label_text = f"{class_name} {obj_id}: {approximate_distance_in_m :.1f}m"
             cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
                         color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
@@ -100,7 +98,7 @@ def draw_instances(image,
                 masked_image = apply_mask(masked_image, mask, color)
 
             # Trajectory
-            trajectory = obj.get_trajectory()
+            trajectory = obj_track.get_trajectory()
             if trajectory:
                 center = box.get_center()
                 arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))

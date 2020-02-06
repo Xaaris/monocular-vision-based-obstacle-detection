@@ -14,7 +14,6 @@ from model.ObjectInstance import ObjectInstance
 
 @dataclass
 class ObjectTrack:
-    id: int
     occurrences: [ObjectInstance] = field(default_factory=list)
 
     def is_present(self) -> bool:
