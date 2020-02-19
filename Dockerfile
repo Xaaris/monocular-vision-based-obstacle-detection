@@ -11,4 +11,4 @@ USER appuser
 WORKDIR /
 ENTRYPOINT ["python3", "/Main.py"]
 
-# docker run -v /data:/data <image name>
+# docker run -v <absolute_path_to_data>:/data -v <absolute_path_to_out_folder>:/out <image name>
