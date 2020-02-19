@@ -1,12 +1,12 @@
+import math
 from dataclasses import dataclass, field
 
 import cv2
 import numpy as np
 from cv2.cv2 import KeyPoint
 
-from mrcnn.CocoClasses import get_class_name_for_id, get_dimensions
-
 from Constants import MATCHER_TYPE, MatcherType, CAMERA_TYPE, VIDEO_SCALE
+from mrcnn.CocoClasses import get_class_name_for_id, get_dimensions
 
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
@@ -51,7 +51,7 @@ class ObjectInstance:
 
     def approximate_distance(self) -> float:
         rl_dim_x, rl_dim_y = get_dimensions(self.class_name)
-        lens_factor = CAMERA_TYPE.value * VIDEO_SCALE
+        lens_factor = CAMERA_TYPE.value[0] * VIDEO_SCALE
         bbox = self.roi
         if not bbox.out_of_frame_left() and not bbox.out_of_frame_right():
             approx_distance_x = (rl_dim_x * lens_factor) / bbox.get_width()
@@ -63,6 +63,21 @@ class ObjectInstance:
             approx_distance_y = 0  # bbox goes out of frame vertically
         approx_distance_in_m = max(approx_distance_x, approx_distance_y)
         return approx_distance_in_m
+
+    def get_3d_position(self) -> tuple:
+        """
+        :returns the approximate position of this object instance in 3d coordinates (x,y,z) in meters
+        relative to the camera. The camera coordinates are defined as (0,0,0)
+        """
+        distance = self.approximate_distance()
+        angle_x_degree = (self.roi.get_position_in_image()[0] - 0.5) * CAMERA_TYPE.value[1]
+        angle_y_degree = (self.roi.get_position_in_image()[1] - 0.5) * CAMERA_TYPE.value[2]
+        angle_x_radian = angle_x_degree * math.pi / 180
+        angle_y_radian = angle_y_degree * math.pi / 180
+        x = distance * math.sin(angle_y_radian) * math.cos(angle_x_radian)
+        y = distance * math.sin(angle_y_radian) * math.sin(angle_x_radian)
+        z = distance * math.cos(angle_y_radian)
+        return x, y, z
 
 
 @timing

@@ -12,10 +12,13 @@ class MatcherType(Enum):
     ORB = "Orb"
     SURF = "Surf"
 
+
 class CameraType(Enum):
-    # Lens factor: image pixels per cm at 1m distance in real world
-    IPHONE_8_PLUS_4K_60 = 32.8
-    IPHONE_XR_4K_60 = 31.2
+    # 1. value: Lens factor: image pixels per cm at 1m distance in real world
+    # 2. value: Field of view horizontal: Field of view in degress in x dimension
+    # 3. value: Field of view vertical: Field of view in degress in y dimension
+    IPHONE_8_PLUS_4K_60 = (32.8, 150, 100)
+    IPHONE_XR_4K_60 = (31.2, 150, 100)
 
 
 VIDEO_FILE = "IMG_5823_BIG"
