@@ -61,7 +61,7 @@ class ObjectInstance:
             approx_distance_y = (rl_dim_y * lens_factor) / bbox.get_height()
         else:
             approx_distance_y = 0  # bbox goes out of frame vertically
-        approx_distance_in_m = max(approx_distance_x, approx_distance_y)
+        approx_distance_in_m = min(approx_distance_x, approx_distance_y)  # one dimension could be occluded
         return approx_distance_in_m
 
     def get_3d_position(self) -> tuple:
