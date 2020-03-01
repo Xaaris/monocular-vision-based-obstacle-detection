@@ -15,10 +15,10 @@ class MatcherType(Enum):
 
 class CameraType(Enum):
     # 1. value: Lens factor: image pixels per cm at 1m distance in real world
-    # 2. value: Field of view horizontal: Field of view in degress in x dimension
-    # 3. value: Field of view vertical: Field of view in degress in y dimension
-    IPHONE_8_PLUS_4K_60 = (32.8, 150, 100)
-    IPHONE_XR_4K_60 = (31.2, 150, 100)
+    # 2. value: Field of view horizontal: Field of view in degrees in x dimension
+    # 3. value: Field of view vertical: Field of view in degrees in y dimension
+    IPHONE_8_PLUS_4K_60 = (32.8, 66, 40)  # rough estimation
+    IPHONE_XR_4K_60 = (31.2, 62.76, 38.58)
 
 
 VIDEO_FILE = "IMG_5823_BIG"
