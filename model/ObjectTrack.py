@@ -17,6 +17,7 @@ class ObjectTrack:
     occurrences: [ObjectInstance] = field(default_factory=list)
 
     def is_present(self) -> bool:
+        """Bool whether object is present in current frame"""
         return len(self.occurrences) > 0 and self.occurrences[-1] is not None
 
     def get_current_instance(self) -> ObjectInstance:
@@ -31,6 +32,7 @@ class ObjectTrack:
         return 0
 
     def get_trajectory(self, over_n_instances: int = 5) -> tuple:
+        """Returns tuple (x,y) of how the object (or rather its found keypoints) on average over the last n frames"""
         if len(self.occurrences) >= 2:
             last_n_instances = list(reversed(self.occurrences[-over_n_instances:]))
             smoothed_translation = (0, 0)
