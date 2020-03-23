@@ -32,7 +32,7 @@ class ObjectTrack:
         return 0
 
     def get_trajectory(self, over_n_instances: int = 5) -> tuple:
-        """Returns tuple (x,y) of how the object (or rather its found keypoints) on average over the last n frames"""
+        """Returns tuple (x,y) of how the object (or rather its found keypoints) moved on average over the last n frames"""
         if len(self.occurrences) >= 2:
             last_n_instances = list(reversed(self.occurrences[-over_n_instances:]))
             smoothed_translation = (0, 0)
