@@ -50,33 +50,43 @@ class ObjectInstance:
         return max(0.0, 1 - normalized_distance)
 
     def approximate_distance(self) -> float:
+        """:returns rough estimation of distance to the object in meters"""
         rl_dim_x, rl_dim_y = get_dimensions(self.class_name)
         lens_factor = CAMERA_TYPE.value[0] * VIDEO_SCALE
         bbox = self.roi
-        if not bbox.out_of_frame_left() and not bbox.out_of_frame_right():
-            approx_distance_x = (rl_dim_x * lens_factor) / bbox.get_width()
+        if bbox.out_of_frame_left() or bbox.out_of_frame_right():
+            # bbox goes out of frame horizontally
+            return self._approximate_distance_vertically(bbox, lens_factor, rl_dim_y)
+        elif bbox.out_of_frame_top() or bbox.out_of_frame_bottom():
+            # bbox goes out of frame vertically
+            return self._approximate_distance_horizontally(bbox, lens_factor, rl_dim_x)
         else:
-            approx_distance_x = 0  # bbox goes out of frame horizontally
-        if not bbox.out_of_frame_top() and not bbox.out_of_frame_bottom():
-            approx_distance_y = (rl_dim_y * lens_factor) / bbox.get_height()
-        else:
-            approx_distance_y = 0  # bbox goes out of frame vertically
-        approx_distance_in_m = min(approx_distance_x, approx_distance_y)  # one dimension could be occluded
-        return approx_distance_in_m
+            approx_distance_vertically = self._approximate_distance_vertically(bbox, lens_factor, rl_dim_y)
+            approx_distance_horizontally = self._approximate_distance_horizontally(bbox, lens_factor, rl_dim_x)
+            return min(approx_distance_vertically, approx_distance_horizontally)  # one dimension could be occluded
+
+    def _approximate_distance_horizontally(self, bbox, lens_factor, rl_dim_x):
+        return (rl_dim_x * lens_factor) / bbox.get_width()
+
+    def _approximate_distance_vertically(self, bbox, lens_factor, rl_dim_y):
+        return (rl_dim_y * lens_factor) / bbox.get_height()
 
     def get_3d_position(self) -> tuple:
         """
         :returns the approximate position of this object instance in 3d coordinates (x,y,z) in meters
-        relative to the camera. The camera coordinates are defined as (0,0,0)
+        relative to the camera. The camera coordinates are defined as (0,0,0).
+        x: negative is left in picture, positive is right
+        y: negative is down in picture, positive is up
+        z: negative is behind the camera (should never happen), positive is straight into the picture
         """
         distance = self.approximate_distance()
         angle_x_degree = (self.roi.get_position_in_image()[0] - 0.5) * CAMERA_TYPE.value[1]
         angle_y_degree = (self.roi.get_position_in_image()[1] - 0.5) * CAMERA_TYPE.value[2]
-        angle_x_radian = angle_x_degree * math.pi / 180
-        angle_y_radian = angle_y_degree * math.pi / 180
-        x = distance * math.sin(angle_y_radian) * math.cos(angle_x_radian)
-        y = distance * math.sin(angle_y_radian) * math.sin(angle_x_radian)
-        z = distance * math.cos(angle_y_radian)
+        angle_x_radian = angle_x_degree * math.pi / 180 + math.pi/2
+        angle_y_radian = angle_y_degree * math.pi / 180 + math.pi/2
+        x = -(distance * math.sin(angle_y_radian) * math.cos(angle_x_radian))
+        y = distance * math.cos(angle_y_radian)
+        z = distance * math.sin(angle_y_radian) * math.sin(angle_x_radian)
         return x, y, z
 
 

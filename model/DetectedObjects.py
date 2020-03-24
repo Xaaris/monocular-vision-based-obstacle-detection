@@ -23,7 +23,7 @@ class DetectedObjects:
         # add None to all obj_tracks that have not found a new instance
         for obj_id, obj_track in self.objects.items():
             if obj_id not in touched_object_ids:
-                obj_track.occurrences.append(None)
+                obj_track.add_occurrence(None)
 
     def _add_object(self, new_obj_instance, already_touched_obj_ids, verbose=False):
 
@@ -40,13 +40,13 @@ class DetectedObjects:
                     print(f"Object existed before: {highest_similarity:.3f} {obj_with_highest_similarity.get_current_instance().class_name}, {obj_with_highest_similarity.get_current_instance().roi}")
                 else:
                     print(f"Object existed before but was not present in this frame: similarity: {highest_similarity:.3f}")
-            obj_with_highest_similarity.occurrences.append(new_obj_instance)
+            obj_with_highest_similarity.add_occurrence(new_obj_instance)
             return obj_id_with_highest_similarity
         else:
             # Add as new object
             if verbose:
                 print("New Object!")
-            new_obj_track = ObjectTrack([new_obj_instance])
+            new_obj_track = ObjectTrack(new_obj_instance)
             new_obj_id = self.get_next_id()
             self.objects[new_obj_id] = new_obj_track
             return new_obj_id

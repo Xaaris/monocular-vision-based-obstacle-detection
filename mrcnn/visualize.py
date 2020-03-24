@@ -106,6 +106,13 @@ def draw_instances(image,
                 arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))
                 cv2.arrowedLine(masked_image, center, arrow_head, (0, 0, 255), 2)
 
+            # Kalman next step prediction
+            x, y = obj_track.get_next_position_prediction()
+            cov_x, cov_y = obj_track.get_position_uncertainty()
+            cv2.circle(masked_image, (x, y), 4, (0, 255, 0), 2)
+            cv2.line(masked_image, (x - cov_x, y), (x + cov_x, y), (0, 0, 255), 1)
+            cv2.line(masked_image, (x, y - cov_y), (x, y + cov_y), (0, 0, 255), 1)
+
     return masked_image
 
 

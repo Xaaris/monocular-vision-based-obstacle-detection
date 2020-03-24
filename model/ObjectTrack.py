@@ -1,7 +1,8 @@
 import operator
-from dataclasses import dataclass, field
 
 from Constants import MATCHER_TYPE, MatcherType
+from model.KalmanTracker import KalmanTracker
+
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
 elif MATCHER_TYPE == MatcherType.SURF:
@@ -12,9 +13,23 @@ else:
 from model.ObjectInstance import ObjectInstance
 
 
-@dataclass
 class ObjectTrack:
-    occurrences: [ObjectInstance] = field(default_factory=list)
+
+    def __init__(self, first_obj_occurrence: ObjectInstance):
+        self.occurrences: [ObjectInstance] = [first_obj_occurrence]
+        x, y = first_obj_occurrence.roi.get_center()
+        self.kalman_tracker: KalmanTracker = KalmanTracker(x, y)
+
+    def add_occurrence(self, new_obj_instance: ObjectInstance):
+        self.occurrences.append(new_obj_instance)
+        center_or_none = None if new_obj_instance is None else new_obj_instance.roi.get_center()
+        self.kalman_tracker.update(center_or_none)
+
+    def get_next_position_prediction(self):
+        return self.kalman_tracker.predict_next_position()
+
+    def get_position_uncertainty(self):
+        return self.kalman_tracker.get_uncertainty()
 
     def is_present(self) -> bool:
         """Bool whether object is present in current frame"""
@@ -24,7 +39,7 @@ class ObjectTrack:
         return self.occurrences[-1] if self.is_present() else None
 
     def similarity_to(self, obj_instance, over_n_instances: int = 5) -> float:
-        last_n_occurrences = self.occurrences[-over_n_instances:]
+        last_n_occurrences = self.occurrences[- over_n_instances:]
         for occurrence in reversed(last_n_occurrences):
             if occurrence is not None:
                 return occurrence.similarity_to(obj_instance)
