@@ -25,6 +25,8 @@ class DetectedObjects:
             if obj_id not in touched_object_ids:
                 obj_track.add_occurrence(None)
 
+        self._delete_old_object_tracks()
+
     def _add_object(self, new_obj_instance, already_touched_obj_ids, verbose=False):
 
         if verbose:
@@ -68,3 +70,8 @@ class DetectedObjects:
                     highest_similarity = similarity_to_current_obj
                     obj_id_with_highest_similarity = obj_id
         return highest_similarity, obj_id_with_highest_similarity
+
+    def _delete_old_object_tracks(self):
+        ids_to_delete = [key for key, obj_track in self.objects.items() if not obj_track.was_present_in_last_n_frames()]
+        for key in ids_to_delete:
+            del self.objects[key]

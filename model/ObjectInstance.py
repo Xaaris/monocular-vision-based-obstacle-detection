@@ -89,6 +89,12 @@ class ObjectInstance:
         z = distance * math.sin(angle_y_radian) * math.sin(angle_x_radian)
         return x, y, z
 
+    def __str__(self):
+        return f"{self.class_name}, " \
+               f"center: {self.roi.get_center()}, " \
+               f"distance: {self.approximate_distance():.1f}, " \
+               f"3d pos: {self.get_3d_position()}"
+
 
 @timing
 def create_objects(result, frame) -> [ObjectInstance]:

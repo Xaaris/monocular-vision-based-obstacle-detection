@@ -35,6 +35,11 @@ class ObjectTrack:
         """Bool whether object is present in current frame"""
         return len(self.occurrences) > 0 and self.occurrences[-1] is not None
 
+    def was_present_in_last_n_frames(self, n=5) -> bool:
+        """Bool whether object was present in the last n frames at least once"""
+        last_n_occurrences = self.occurrences[- n:]
+        return any(last_n_occurrences)  # checks if any is not None
+
     def get_current_instance(self) -> ObjectInstance:
         return self.occurrences[-1] if self.is_present() else None
 
@@ -73,3 +78,11 @@ class ObjectTrack:
 
             smoothed_translation = tuple(map(lambda x: x/over_n_instances, smoothed_translation))  # div by over_n_instances
             return smoothed_translation
+
+    def __str__(self):
+        return f"{len(self.occurrences)} occurrences, " \
+               f"current instance: {self.get_current_instance()}, " \
+               f"present in last 5 frames: {self.was_present_in_last_n_frames(5)}, " \
+               f"next predicted pos: {self.get_next_position_prediction()}, " \
+               f"pos uncertainty: {self.get_position_uncertainty()}," \
+               f"trajectory: {self.get_trajectory()}"
