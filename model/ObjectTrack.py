@@ -1,7 +1,7 @@
 import operator
 
 from Constants import MATCHER_TYPE, MatcherType
-from model.KalmanTracker import KalmanTracker
+from matcher.KalmanTracker import KalmanTracker
 
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
