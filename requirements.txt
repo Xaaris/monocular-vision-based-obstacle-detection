@@ -1,7 +1,8 @@
-moviepy==1.0.1
-scikit-image
+moviepy==1.0.2
+scikit-image~=0.16.2
 tensorflow==1.15.2
 keras==2.3.1
 opencv-contrib-python-nonfree==4.1.1.1
-tabulate==0.8.6
+tabulate~=0.8.7
 filterpy==1.4.5
+numpy~=1.18.2
