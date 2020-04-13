@@ -67,6 +67,7 @@ def draw_instances(image,
 
     masked_image = image.copy()
     for obj_id, obj_track in detected_objects.objects.items():
+        print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
 
         if obj_track.is_present():
 
@@ -89,7 +90,6 @@ def draw_instances(image,
             confidence_score = current_instance.confidence_score
             approximate_distance_in_m = current_instance.approximate_distance()
             position_3d = current_instance.get_3d_position()
-            print(class_name, obj_id, round(approximate_distance_in_m, 2), tuple(map(lambda x: round(x, 2), position_3d)))
             label_text = f"{class_name} {obj_id}: {approximate_distance_in_m :.1f}m"
             cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
                         color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
@@ -109,12 +109,11 @@ def draw_instances(image,
             # Kalman next step prediction
             x, y = obj_track.get_next_position_prediction()
             cov_x, cov_y = obj_track.get_position_uncertainty()
-            cv2.circle(masked_image, (x, y), 4, (0, 255, 0), 2)
-            cv2.line(masked_image, (x - cov_x, y), (x + cov_x, y), (0, 0, 255), 1)
-            cv2.line(masked_image, (x, y - cov_y), (x, y + cov_y), (0, 0, 255), 1)
+            cv2.line(masked_image, (x - int(cov_x / 2), y), (x + int(cov_x / 2), y), (0, 255, 0), 1)
+            cv2.line(masked_image, (x, y - int(cov_y / 2)), (x, y + int(cov_y / 2)), (0, 255, 0), 1)
 
     return masked_image
 
 
-max_number_of_colors = 50
+max_number_of_colors = 30
 static_colors = random_colors(max_number_of_colors)

@@ -1,4 +1,5 @@
 import operator
+from typing import Optional
 
 from Constants import MATCHER_TYPE, MatcherType
 from matcher.KalmanTracker import KalmanTracker
@@ -16,11 +17,12 @@ from model.ObjectInstance import ObjectInstance
 class ObjectTrack:
 
     def __init__(self, first_obj_occurrence: ObjectInstance):
-        self.occurrences: [ObjectInstance] = [first_obj_occurrence]
+        self.occurrences: [Optional[ObjectInstance]] = [first_obj_occurrence]
         x, y = first_obj_occurrence.roi.get_center()
         self.kalman_tracker: KalmanTracker = KalmanTracker(x, y)
+        self.class_name: str = first_obj_occurrence.class_name
 
-    def add_occurrence(self, new_obj_instance: ObjectInstance):
+    def add_occurrence(self, new_obj_instance: Optional[ObjectInstance]):
         self.occurrences.append(new_obj_instance)
         center_or_none = None if new_obj_instance is None else new_obj_instance.roi.get_center()
         self.kalman_tracker.update(center_or_none)
@@ -43,7 +45,13 @@ class ObjectTrack:
     def get_current_instance(self) -> ObjectInstance:
         return self.occurrences[-1] if self.is_present() else None
 
-    def similarity_to(self, obj_instance, over_n_instances: int = 5) -> float:
+    def similarity_to(self, obj_instance: ObjectInstance, over_n_instances: int = 5) -> float:
+        # Check if same class
+        if not self.class_name == obj_instance.class_name:
+            return 0
+        # Check if location checks out
+        if not self.kalman_tracker.is_point_in_general_predicted_area(obj_instance.roi.get_center()):
+            return 0
         last_n_occurrences = self.occurrences[- over_n_instances:]
         for occurrence in reversed(last_n_occurrences):
             if occurrence is not None:

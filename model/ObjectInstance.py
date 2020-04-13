@@ -18,7 +18,6 @@ else:
 from model.Box import Box
 from utils.timer import timing
 
-LOCATION_VARIANCE_THRESHOLD = 0.1  # how far an object can move between two frames before it is recognized as a new obj
 CONFIDENCE_SCORE_THRESHOLD = 0.8  # Only objects with higher confidence are taken into account
 
 
@@ -32,17 +31,8 @@ class ObjectInstance:
     descriptors: np.ndarray = None
 
     def similarity_to(self, obj_instance) -> float:
-        # Check if same class
-        if not self.class_name == obj_instance.class_name:
-            return 0
         # Check if both have descriptors
         if self.descriptors is None or obj_instance.descriptors is None:
-            return 0
-        # Check if instances are in similar location
-        this_position_x, this_position_y = self.roi.get_position_in_image()
-        other_position_x, other_position_y = obj_instance.roi.get_position_in_image()
-        if abs(this_position_x - other_position_x) > LOCATION_VARIANCE_THRESHOLD or \
-                abs(this_position_y - other_position_y) > LOCATION_VARIANCE_THRESHOLD:
             return 0
         # Check if descriptors match
         average_distance = average_descriptor_distance(self.descriptors, obj_instance.descriptors)
