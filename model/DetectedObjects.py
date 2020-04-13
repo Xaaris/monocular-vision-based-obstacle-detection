@@ -1,13 +1,16 @@
+from typing import Dict
+
 from model.ObjectTrack import ObjectTrack
 
 SAMENESS_THRESHOLD = 0.3  # 0 = match all, 1 match basically none
+KEEP_TRACK_OF_OBJS_FOR_N_FRAMES = 5
 
 
 class DetectedObjects:
 
     def __init__(self):
         self.nextObjectID = 0
-        self.objects: dict = dict()
+        self.objects: Dict[int, ObjectTrack] = dict()
 
     def get_next_id(self) -> int:
         self.nextObjectID += 1
@@ -58,7 +61,7 @@ class DetectedObjects:
         highest_similarity = 0
         for obj_id, obj_track in self.objects.items():
             if obj_id not in already_touched_obj_ids:
-                similarity_to_current_obj = obj_track.similarity_to(new_obj_instance)
+                similarity_to_current_obj = obj_track.similarity_to(new_obj_instance, over_n_instances=KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)
                 if verbose:
                     if obj_track.is_present():
                         print(
@@ -72,6 +75,6 @@ class DetectedObjects:
         return highest_similarity, obj_id_with_highest_similarity
 
     def _delete_old_object_tracks(self):
-        ids_to_delete = [key for key, obj_track in self.objects.items() if not obj_track.was_present_in_last_n_frames()]
+        ids_to_delete = [key for key, obj_track in self.objects.items() if not obj_track.was_present_in_last_n_frames(KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)]
         for key in ids_to_delete:
             del self.objects[key]
