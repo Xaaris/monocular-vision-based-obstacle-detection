@@ -27,8 +27,8 @@ class KalmanTracker:
         self.kf.H = np.array([[1., 0, 0, 0, 0, 0],  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
                               [0., 1, 0, 0, 0, 0]])  # Measurement function
 
-        self.kf.P *= Constants.INPUT_DIMENSIONS[0] / 10  # covariance matrix
-        self.kf.R = np.eye(2) * 25  # measurement uncertainty
+        self.kf.P *= Constants.INPUT_DIMENSIONS[0] / 12  # covariance matrix
+        self.kf.R = np.eye(2) * Constants.INPUT_DIMENSIONS[0] / 24  # measurement uncertainty
         self.kf.Q = Q_discrete_white_noise(2, dt=dt, var=.1, block_size=3, order_by_dim=False)  # process uncertainty
 
 
