@@ -5,6 +5,7 @@
 
 ### Here is an example (WIP):
 ![Example video](./../images/images/example.gif?raw=true)
+
 The red arrows are the objects predicted trajectory.
 The faint green crosses in the middle of the objects represents the uncertainty of the Kalman Filter at that step.
 
