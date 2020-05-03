@@ -48,7 +48,7 @@ class KalmanTracker:
         covariances = np.diag(covariance_matrix)  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
         return int(min(covariances[0], MAX_UNCERTAINTY)), int(min(covariances[1], MAX_UNCERTAINTY))
 
-    def is_point_in_general_predicted_area(self, point: Tuple[float, float]) -> bool:
+    def is_point_in_predicted_area(self, point: Tuple[float, float]) -> bool:
         x, y = self.predict_next_position()
         cov_x, cov_y = self.get_uncertainty()
         p_x, p_y = point

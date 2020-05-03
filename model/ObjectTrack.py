@@ -50,7 +50,7 @@ class ObjectTrack:
         if not self.class_name == obj_instance.class_name:
             return 0
         # Check if location checks out
-        if not self.kalman_tracker.is_point_in_general_predicted_area(obj_instance.roi.get_center()):
+        if not self.kalman_tracker.is_point_in_predicted_area(obj_instance.roi.get_center()):
             return 0
         last_n_occurrences = self.occurrences[- over_n_instances:]
         for occurrence in reversed(last_n_occurrences):

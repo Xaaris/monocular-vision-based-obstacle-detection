@@ -35,44 +35,31 @@ class DetectedObjects:
         if verbose:
             print(f"\nNew Object: {new_obj_instance.class_name}, {new_obj_instance.roi}")
 
-        highest_similarity, obj_id_with_highest_similarity = self._find_existing_object_with_highest_similarity(already_touched_obj_ids, new_obj_instance, verbose)
+        obj_id_with_sufficient_similarity = self._find_existing_matching_obj_track(already_touched_obj_ids, new_obj_instance, verbose)
 
-        if highest_similarity > SAMENESS_THRESHOLD:
+        if obj_id_with_sufficient_similarity:
             # Add to existing object
-            obj_with_highest_similarity = self.objects[obj_id_with_highest_similarity]
-            if verbose:
-                if obj_with_highest_similarity.is_present():
-                    print(f"Object existed before: {highest_similarity:.3f} {obj_with_highest_similarity.get_current_instance().class_name}, {obj_with_highest_similarity.get_current_instance().roi}")
-                else:
-                    print(f"Object existed before but was not present in this frame: similarity: {highest_similarity:.3f}")
+            obj_with_highest_similarity = self.objects[obj_id_with_sufficient_similarity]
             obj_with_highest_similarity.add_occurrence(new_obj_instance)
-            return obj_id_with_highest_similarity
+            return obj_id_with_sufficient_similarity
         else:
             # Add as new object
-            if verbose:
-                print("New Object!")
             new_obj_track = ObjectTrack(new_obj_instance)
             new_obj_id = self.get_next_id()
             self.objects[new_obj_id] = new_obj_track
             return new_obj_id
 
-    def _find_existing_object_with_highest_similarity(self, already_touched_obj_ids, new_obj_instance, verbose):
-        obj_id_with_highest_similarity = None
+    def _find_existing_matching_obj_track(self, already_touched_obj_ids, new_obj_instance, verbose):
+        obj_id_with_sufficient_similarity = None
         highest_similarity = 0
         for obj_id, obj_track in self.objects.items():
             if obj_id not in already_touched_obj_ids:
                 similarity_to_current_obj = obj_track.similarity_to(new_obj_instance, over_n_instances=KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)
-                if verbose:
-                    if obj_track.is_present():
-                        print(
-                            f"Similarity to obj {obj_id}: {similarity_to_current_obj:.3f}, {obj_track.get_current_instance().class_name}, {obj_track.get_current_instance().roi}")
-                    else:
-                        print(
-                            f"Similarity to obj {obj_id}: {similarity_to_current_obj:.3f}, Not present in current frame")
                 if similarity_to_current_obj > highest_similarity:
                     highest_similarity = similarity_to_current_obj
-                    obj_id_with_highest_similarity = obj_id
-        return highest_similarity, obj_id_with_highest_similarity
+                    if similarity_to_current_obj > SAMENESS_THRESHOLD:
+                        obj_id_with_sufficient_similarity = obj_id
+        return obj_id_with_sufficient_similarity
 
     def _delete_old_object_tracks(self):
         ids_to_delete = [key for key, obj_track in self.objects.items() if not obj_track.was_present_in_last_n_frames(KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)]
