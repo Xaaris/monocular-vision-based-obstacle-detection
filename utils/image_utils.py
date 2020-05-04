@@ -106,12 +106,16 @@ def get_frames_from_video(path_to_video, from_sec=0, to_sec=None):
         yield color_corrected_frame
 
 
-def get_frames_from_image_directory(path, image_type="png", from_image=0, to_image=None):
+def get_frames_from_image_directory(path, image_types=None, from_image=0, to_image=None):
     """
     Generator that reads a directory of images from disk and yields a image at a time
     """
-    fullpath = os.path.abspath(path)
-    image_paths = glob.glob(os.path.join(fullpath, '*.' + image_type))
+    if image_types is None:
+        image_types = ["png", "jpg"]
+    full_path_to_dir = os.path.abspath(path)
+    image_paths = []
+    for image_type in image_types:
+        image_paths.extend(glob.glob(os.path.join(full_path_to_dir, '*.' + image_type)))
     image_paths.sort()
     for image_path in image_paths[from_image:to_image]:
         image = cv2.imread(image_path)
