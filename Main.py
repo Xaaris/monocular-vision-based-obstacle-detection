@@ -26,4 +26,5 @@ if __name__ == "__main__":
         asyncio.run(save_debug_image(result_frame, "frame_" + str(frame_number)))
         output_video.write(result_frame)
 
+    output_video.release()
     print_timing_results()
