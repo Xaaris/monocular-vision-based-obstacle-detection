@@ -1,11 +1,12 @@
 """Miscellaneous utility functions for working with images"""
 import glob
+import os
 
 import cv2.cv2 as cv2
 from cv2.cv2 import VideoWriter
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from Constants import *
+from Constants import InputDataType
 
 
 def letterbox_image(image, desired_size):
@@ -142,9 +143,9 @@ def draw_rectangle(image, box, color=(0, 0, 255), thickness=2, offset=(0, 0)):
     cv2.rectangle(image, (left, top), (right, bottom), color, thickness)
 
 
-def prepare_video_output() -> VideoWriter:
-    output_identifier = VIDEO_FILE if INPUT_DATA_TYPE == InputDataType.VIDEO else IMAGE_DIRECTORY
-    output_identifier = output_identifier.replace("/", "_")
-    output_file_path = "out/out_" + output_identifier + "_" + MATCHER_TYPE.value + "_" + str(FROM_SEC_OR_IMAGE) + "_to_" + str(TO_SEC_OR_IMAGE) + VIDEO_FORMAT
-    video_writer = cv2.VideoWriter(output_file_path, cv2.VideoWriter_fourcc("X", "V", "I", "D"), FPS, INPUT_DIMENSIONS)
+def prepare_video_output(input_path, matcher_type, from_sec_or_image, to_sec_or_image, fps, input_dimensions) -> VideoWriter:
+    output_identifier = input_path.split("/")[-1]  # Get just last part of the path
+    output_identifier = output_identifier.replace(".", "_")
+    output_file_path = "out/out_" + output_identifier + "_" + matcher_type + "_" + str(from_sec_or_image) + "_to_" + str(to_sec_or_image) + ".mov"
+    video_writer = cv2.VideoWriter(output_file_path, cv2.VideoWriter_fourcc("X", "V", "I", "D"), fps, input_dimensions)
     return video_writer
