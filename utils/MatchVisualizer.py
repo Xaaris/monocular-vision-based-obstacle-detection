@@ -27,7 +27,9 @@ if __name__ == "__main__":
     image_1 = cv2.imread(IMAGE_PATH_1)
     image_2 = cv2.imread(IMAGE_PATH_2)
 
+    print("detecting objects in image 1")
     result_1 = detect(image_1)
+    print("detecting objects in image 2")
     result_2 = detect(image_2)
 
     objects_1 = create_objects(result_1, image_1)
