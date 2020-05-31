@@ -12,6 +12,6 @@ The faint green crosses in the middle of the objects represents the uncertainty 
 
 
 ### Requierements
-- This project requires Python 3.7 or above as it makes use of the new [Data Classes](https://docs.python.org/3/library/dataclasses.html).
+- This project requires Python 3.7 as it makes use of the new [Data Classes](https://docs.python.org/3/library/dataclasses.html) but Terraform does not support python 3.8 yet.
 - This repository uses [Git LFS](https://git-lfs.github.com) to store the large weights files.
 - The python dependencies are listed in the requirements.txt.
