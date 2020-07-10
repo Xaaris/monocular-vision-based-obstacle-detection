@@ -14,7 +14,7 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 
 
 @timing
-def get_matches(descriptor_a, descriptor_b, max_distance=100):
+def get_matches(descriptor_a, descriptor_b, max_distance=500):
     matches = _get_matches(descriptor_a, descriptor_b)
     filtered_matches = list(filter(lambda m: m.distance <= max_distance, matches))
     return filtered_matches
@@ -27,6 +27,11 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
         return 100
 
     matches = _get_matches(descriptor_a, descriptor_b)
+    avg_number_of_descriptors = (len(descriptor_a) + len(descriptor_b)) / 2
+    percent_of_matches = len(matches) / avg_number_of_descriptors
+    if percent_of_matches < 0.1:
+        return 100  # Less than 10% matches -> No Similarity
+
     # sum distances
     total_distance = sum([m.distance for m in matches])
     # divide by number of matches

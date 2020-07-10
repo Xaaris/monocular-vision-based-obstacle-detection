@@ -23,9 +23,13 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
         return 100
 
     matches = _get_matches(descriptor_a, descriptor_b)
+    avg_number_of_descriptors = (len(descriptor_a) + len(descriptor_b)) / 2
+    percent_of_matches = len(matches) / avg_number_of_descriptors
+    if percent_of_matches < 0.1:
+        return 100  # Less than 10% matches -> No Similarity
 
     # sum distances
-    total_distance = sum([d.distance for d in matches])
+    total_distance = sum([m.distance for m in matches])
     # divide by number of matches
     return total_distance / len(matches) if len(matches) > 0 else 100
 
