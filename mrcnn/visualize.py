@@ -127,7 +127,6 @@ def draw_depth_map(image, detected_objects: DetectedObjects, show_distance=False
     depth_image = np.zeros(image.shape, dtype=np.uint8)
 
     for obj_track in detected_objects.objects.values():
-        print(obj_track.class_name, obj_track.is_present())
 
         if obj_track.is_present():
 
