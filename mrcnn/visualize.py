@@ -5,6 +5,8 @@ Display and Visualization Functions.
 Copyright (c) 2017 Matterport, Inc.
 Licensed under the MIT License (see LICENSE for details)
 Written by Waleed Abdulla
+
+Adapted by Johannes Berger
 """
 
 import colorsys
@@ -16,11 +18,6 @@ import numpy as np
 from model.Box import Box
 from model.DetectedObjects import DetectedObjects
 from utils.timer import timing
-
-
-############################################################
-#  Visualization
-############################################################
 
 
 def random_colors(number_of_colors, bright=True):
@@ -40,11 +37,10 @@ def random_colors(number_of_colors, bright=True):
 def apply_mask(image, mask, color, alpha=0.5):
     """Apply the given mask to the image.
     """
-    for c in range(3):
-        image[:, :, c] = np.where(mask == 1,
-                                  image[:, :, c] *
-                                  (1 - alpha) + alpha * color[c],
-                                  image[:, :, c])
+    for channel in range(3):
+        image[:, :, channel] = np.where(mask == 1,
+                                        image[:, :, channel] * (1 - alpha) + alpha * color[channel],
+                                        image[:, :, channel])
     return image
 
 
@@ -52,20 +48,21 @@ def apply_mask(image, mask, color, alpha=0.5):
 def draw_instances(image,
                    detected_objects: DetectedObjects,
                    show_mask=True,
-                   show_bbox=True):
+                   show_bbox=True,
+                   show_label=True,
+                   show_trajectory=True,
+                   show_confidence_score=False,
+                   show_distance=False,
+                   show_3d_position=False,
+                   show_kalman_prediction_area=False):
     """
-    boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
-    masks: [height, width, num_instances]
-    class_ids: [num_instances]
-    class_names: list of class names of the dataset
-    scores: (optional) confidence scores for each box
-    show_mask, show_bbox: To show masks and bounding boxes or not
-    colors: (optional) An array or colors to use with each object
+    image: image to copy and illustrate on
+    detected_objects: objects to draw
+    show_x: Display various features
     """
-    # Number of instances
-    number_of_objects = len(detected_objects.objects)
 
-    masked_image = image.copy()
+    result_image = image.copy()
+
     for obj_id, obj_track in detected_objects.objects.items():
         print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
 
@@ -80,39 +77,83 @@ def draw_instances(image,
                 # Skip this instance. Has no bbox. Likely lost in image cropping.
                 continue
             box: Box = current_instance.roi
-            pt1 = (box.x1, box.y1)
-            pt2 = (box.x2, box.y2)
             if show_bbox:
-                cv2.rectangle(masked_image, pt1=pt1, pt2=pt2, color=color, thickness=1)
+                pt1 = (box.x1, box.y1)
+                pt2 = (box.x2, box.y2)
+                cv2.rectangle(result_image, pt1=pt1, pt2=pt2, color=color, thickness=1)
 
             # Label
-            class_name = current_instance.class_name
-            confidence_score = current_instance.confidence_score
-            approximate_distance_in_m = current_instance.approximate_distance()
-            position_3d = current_instance.get_3d_position()
-            label_text = f"{class_name} {obj_id}: {approximate_distance_in_m :.1f}m"
-            cv2.putText(masked_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
-                        color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+            if show_label:
+                class_name = current_instance.class_name
+                label_text = f"{class_name} {obj_id}: "
+                if show_confidence_score:
+                    label_text += f"score: {current_instance.confidence_score : .3f} "
+                if show_distance:
+                    label_text += f"dist: {current_instance.approximate_distance() : .1f} "
+                if show_3d_position:
+                    label_text += f"3D pos: {current_instance.get_3d_position()} "
+                cv2.putText(result_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
+                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
             # Mask
-            mask = current_instance.mask
             if show_mask:
-                masked_image = apply_mask(masked_image, mask, color)
+                mask = current_instance.mask
+                result_image = apply_mask(result_image, mask, color)
 
             # Trajectory
             trajectory = obj_track.get_trajectory()
-            if trajectory:
+            if show_trajectory and trajectory:
                 center = box.get_center()
                 arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))
-                cv2.arrowedLine(masked_image, center, arrow_head, (0, 0, 255), 2)
+                cv2.arrowedLine(result_image, center, arrow_head, (0, 0, 255), 2)
 
             # Kalman next step prediction
-            x, y = obj_track.get_next_position_prediction()
-            cov_x, cov_y = obj_track.get_position_uncertainty()
-            cv2.line(masked_image, (x - int(cov_x / 2), y), (x + int(cov_x / 2), y), (0, 255, 0), 1)
-            cv2.line(masked_image, (x, y - int(cov_y / 2)), (x, y + int(cov_y / 2)), (0, 255, 0), 1)
+            if show_kalman_prediction_area:
+                x, y = obj_track.get_next_position_prediction()
+                cov_x, cov_y = obj_track.get_position_uncertainty()
+                cv2.line(result_image, (x - int(cov_x / 2), y), (x + int(cov_x / 2), y), (0, 255, 0), 1)
+                cv2.line(result_image, (x, y - int(cov_y / 2)), (x, y + int(cov_y / 2)), (0, 255, 0), 1)
 
-    return masked_image
+    return result_image
+
+
+@timing
+def draw_depth_map(image, detected_objects: DetectedObjects, show_distance=False):
+    """
+    image: only used for dimensions
+    detected_objects: objects to draw depth of
+    """
+
+    depth_image = np.zeros(image.shape, dtype=np.uint8)
+
+    for obj_track in detected_objects.objects.values():
+        print(obj_track.class_name, obj_track.is_present())
+
+        if obj_track.is_present():
+
+            current_instance = obj_track.get_current_instance()
+            distance = current_instance.approximate_distance()
+
+            color = [int(max(255 - distance, 0))] * 3
+
+            # Bounding box
+            if not np.any(current_instance.roi):
+                # Skip this instance. Has no bbox. Likely lost in image cropping.
+                continue
+
+            # Label
+            if show_distance:
+                box: Box = current_instance.roi
+                class_name = current_instance.class_name
+                label_text = f"{class_name} : {distance :.1f}m"
+                cv2.putText(depth_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
+                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+
+            # Mask
+            mask = current_instance.mask
+            depth_image = apply_mask(depth_image, mask, color, alpha=1)
+
+    return depth_image
 
 
 max_number_of_colors = 30
