@@ -58,6 +58,8 @@ class InferenceConfig(CocoConfig):
     IMAGE_MIN_DIM = find_closest_acceptable_number(min(INPUT_DIMENSIONS))
     IMAGE_MAX_DIM = find_closest_acceptable_number(max(INPUT_DIMENSIONS))  # TODO: experiment with results and timing to see if its worth to lower this
 
+    DETECTION_MIN_CONFIDENCE = 0.8
+
 
 config = InferenceConfig()
 config.display()
