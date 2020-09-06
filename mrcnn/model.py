@@ -1421,6 +1421,7 @@ class MaskRCNN():
                                  mrcnn_mask, rpn_rois, rpn_class, rpn_bbox],
                              name='mask_rcnn')
 
+        # print(model.summary())
         return model
 
 

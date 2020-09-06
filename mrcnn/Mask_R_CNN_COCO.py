@@ -42,12 +42,12 @@ class CocoConfig(Config):
 
 
 def find_closest_acceptable_number(number):
-    # find closest number which is four times divisible by 2
-    if number % 16 == 0:
+    # find closest number which is six times divisible by 2
+    if number % 64 == 0:
         return number
     else:
-        multiplier = round(number / 16)
-        return 16 * multiplier
+        multiplier = round(number / 64)
+        return 64 * multiplier
 
 
 class InferenceConfig(CocoConfig):
