@@ -16,6 +16,7 @@ from model.DetectedObjects import DetectedObjects
 from model.ObjectInstance import create_objects
 from mrcnn.Mask_R_CNN_COCO import detect
 from utils.image_utils import show
+import numpy as np
 
 IMAGE_PATH_1 = os.path.join(ROOT_DIR, "data/testImages/000000.png")
 IMAGE_PATH_2 = os.path.join(ROOT_DIR, "data/testImages/000001.png")
@@ -35,6 +36,9 @@ if __name__ == "__main__":
     objects_1 = create_objects(result_1, image_1)
     objects_2 = create_objects(result_2, image_2)
 
+    if not objects_1 or not objects_2:
+        print("Not enough objects found")
+
     detected_objects.add_objects(objects_1)
     detected_objects.add_objects(objects_2)
 
@@ -46,6 +50,7 @@ if __name__ == "__main__":
             obj_instance_1 = detected_object.occurrences[0]
             obj_instance_2 = detected_object.occurrences[1]
 
-            matches = get_matches(obj_instance_1.descriptors, obj_instance_2.descriptors, 1000)
-            image_with_matches = cv2.drawMatches(image_1, obj_instance_1.keypoints, image_2, obj_instance_2.keypoints, matches, None)
-            show(image_with_matches, "Matches", await_keypress=True)
+            for dist in np.linspace(100, 1000, 5):
+                matches = get_matches(obj_instance_1.descriptors, obj_instance_2.descriptors, dist)
+                image_with_matches = cv2.drawMatches(image_1, obj_instance_1.keypoints, image_2, obj_instance_2.keypoints, matches, None)
+                show(image_with_matches, "Matches: dist=" + str(dist), await_keypress=True)
