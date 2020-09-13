@@ -6,7 +6,7 @@ from filterpy.kalman import KalmanFilter
 
 import Constants
 
-MAX_UNCERTAINTY = Constants.INPUT_DIMENSIONS[0] / 3
+MAX_UNCERTAINTY = Constants.INPUT_DIMENSIONS[0] / 5
 
 
 class KalmanTracker:
@@ -27,29 +27,41 @@ class KalmanTracker:
         self.kf.H = np.array([[1., 0, 0, 0, 0, 0],  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
                               [0., 1, 0, 0, 0, 0]])  # Measurement function
 
-        self.kf.P *= Constants.INPUT_DIMENSIONS[0] / 12  # covariance matrix
-        self.kf.R = np.eye(2) * Constants.INPUT_DIMENSIONS[0] / 24  # measurement uncertainty
+        self.kf.P *= Constants.INPUT_DIMENSIONS[0] / 5  # covariance matrix
+        self.kf.R = np.eye(2) * Constants.INPUT_DIMENSIONS[0] / 30  # measurement uncertainty
         self.kf.Q = Q_discrete_white_noise(2, dt=dt, var=.1, block_size=3, order_by_dim=False)  # process uncertainty
+        self.last_position_prediction = (0, 0)
+        self.last_position_uncertainty = (0, 0)
 
 
 
     def update(self, center_or_none):
+        self.last_position_prediction = self.next_position_prediction()
+        self.last_position_uncertainty = self.next_position_uncertainty()
         if center_or_none:
             self.kf.update(center_or_none)
         self.kf.predict()
 
-    def predict_next_position(self) -> Tuple[int, int]:
-        """ This function estimates the position of the object in the next time step"""
+    def next_position_prediction(self) -> Tuple[int, int]:
+        """ This function returns the estimated the position of the object in the next time step"""
         return int(self.kf.x[0][0]), int(self.kf.x[1][0])
 
-    def get_uncertainty(self) -> Tuple[int, int]:
+    def current_position_prediction(self) -> Tuple[int, int]:
+        """ This function returns the estimated the position of the object for the current time step (last prediction)"""
+        return self.last_position_prediction
+
+    def next_position_uncertainty(self) -> Tuple[int, int]:
         """Returns a tuple with uncertainty in x and y direction"""
         covariance_matrix = self.kf.P
         covariances = np.diag(covariance_matrix)  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
         return int(min(covariances[0], MAX_UNCERTAINTY)), int(min(covariances[1], MAX_UNCERTAINTY))
 
+    def current_position_uncertainty(self) -> Tuple[int, int]:
+        """Returns a tuple with uncertainty in x and y direction for the current time step (last prediction)"""
+        return self.last_position_uncertainty
+
     def is_point_in_predicted_area(self, point: Tuple[float, float]) -> bool:
-        x, y = self.predict_next_position()
-        cov_x, cov_y = self.get_uncertainty()
+        x, y = self.next_position_prediction()
+        cov_x, cov_y = self.next_position_uncertainty()
         p_x, p_y = point
         return x - cov_x / 2 < p_x < x + cov_x / 2 and y - cov_y / 2 < p_y < y + cov_y / 2

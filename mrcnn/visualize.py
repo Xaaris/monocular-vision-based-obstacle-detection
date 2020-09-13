@@ -48,13 +48,14 @@ def apply_mask(image, mask, color, alpha=0.5):
 def draw_instances(image,
                    detected_objects: DetectedObjects,
                    show_mask=True,
-                   show_bbox=True,
-                   show_label=True,
+                   show_bbox=False,
+                   show_label=False,
                    show_trajectory=True,
-                   show_confidence_score=False,
+                   show_confidence_score=True,
                    show_distance=False,
                    show_3d_position=False,
-                   show_kalman_prediction_area=False):
+                   show_kalman_next_prediction_area=False,
+                   show_kalman_last_prediction_area=False):
     """
     image: image to copy and illustrate on
     detected_objects: objects to draw
@@ -64,7 +65,7 @@ def draw_instances(image,
     result_image = image.copy()
 
     for obj_id, obj_track in detected_objects.objects.items():
-        print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
+        # print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
 
         if obj_track.is_present():
 
@@ -108,11 +109,19 @@ def draw_instances(image,
                 cv2.arrowedLine(result_image, center, arrow_head, (0, 0, 255), 2)
 
             # Kalman next step prediction
-            if show_kalman_prediction_area:
+            if show_kalman_next_prediction_area:
                 x, y = obj_track.get_next_position_prediction()
-                cov_x, cov_y = obj_track.get_position_uncertainty()
+                cov_x, cov_y = obj_track.get_next_position_uncertainty()
                 cv2.line(result_image, (x - int(cov_x / 2), y), (x + int(cov_x / 2), y), (0, 255, 0), 1)
                 cv2.line(result_image, (x, y - int(cov_y / 2)), (x, y + int(cov_y / 2)), (0, 255, 0), 1)
+
+            # Kalman current step prediction
+            if show_kalman_last_prediction_area:
+                x, y = obj_track.get_current_position_prediction()
+                cov_x, cov_y = obj_track.get_current_position_uncertainty()
+                pt1 = (x - int(cov_x / 2), y - int(cov_y / 2))
+                pt2 = (x + int(cov_x / 2), y + int(cov_y / 2))
+                cv2.rectangle(result_image, pt1=pt1, pt2=pt2, color=(0, 255, 0), thickness=1)
 
     return result_image
 

@@ -21,6 +21,7 @@ class ObjectTrack:
         x, y = first_obj_occurrence.roi.get_center()
         self.kalman_tracker: KalmanTracker = KalmanTracker(x, y)
         self.class_name: str = first_obj_occurrence.class_name
+        self.active = True  # Boolean whether this object is considered for matching or not
 
     def add_occurrence(self, new_obj_instance: Optional[ObjectInstance]):
         self.occurrences.append(new_obj_instance)
@@ -28,10 +29,16 @@ class ObjectTrack:
         self.kalman_tracker.update(center_or_none)
 
     def get_next_position_prediction(self):
-        return self.kalman_tracker.predict_next_position()
+        return self.kalman_tracker.next_position_prediction()
 
-    def get_position_uncertainty(self):
-        return self.kalman_tracker.get_uncertainty()
+    def get_current_position_prediction(self):
+        return self.kalman_tracker.current_position_prediction()
+
+    def get_next_position_uncertainty(self):
+        return self.kalman_tracker.next_position_uncertainty()
+
+    def get_current_position_uncertainty(self):
+        return self.kalman_tracker.current_position_uncertainty()
 
     def is_present(self) -> bool:
         """Bool whether object is present in current frame"""
@@ -92,5 +99,5 @@ class ObjectTrack:
                f"current instance: {self.get_current_instance()}, " \
                f"present in last 5 frames: {self.was_present_in_last_n_frames(5)}, " \
                f"next predicted pos: {self.get_next_position_prediction()}, " \
-               f"pos uncertainty: {self.get_position_uncertainty()}," \
+               f"pos uncertainty: {self.get_next_position_uncertainty()}," \
                f"trajectory: {self.get_trajectory()}"

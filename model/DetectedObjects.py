@@ -16,6 +16,10 @@ class DetectedObjects:
         self.nextObjectID += 1
         return self.nextObjectID
 
+    def get_active_object_tracks(self) -> Dict[int, ObjectTrack]:
+        return {key: track for key, track in self.objects.items() if track.active is True}
+
+
     def add_objects(self, new_objects):
 
         touched_object_ids = set()
@@ -24,7 +28,7 @@ class DetectedObjects:
             touched_object_ids.add(new_or_added_to_obj_id)
 
         # add None to all obj_tracks that have not found a new instance
-        for obj_id, obj_track in self.objects.items():
+        for obj_id, obj_track in self.get_active_object_tracks().items():
             if obj_id not in touched_object_ids:
                 obj_track.add_occurrence(None)
 
@@ -35,7 +39,7 @@ class DetectedObjects:
         if verbose:
             print(f"\nNew Object: {new_obj_instance.class_name}, {new_obj_instance.roi}")
 
-        obj_id_with_sufficient_similarity = self._find_existing_matching_obj_track(already_touched_obj_ids, new_obj_instance, verbose)
+        obj_id_with_sufficient_similarity = self._find_existing_matching_obj_track(already_touched_obj_ids, new_obj_instance)
 
         if obj_id_with_sufficient_similarity:
             # Add to existing object
@@ -49,10 +53,10 @@ class DetectedObjects:
             self.objects[new_obj_id] = new_obj_track
             return new_obj_id
 
-    def _find_existing_matching_obj_track(self, already_touched_obj_ids, new_obj_instance, verbose):
+    def _find_existing_matching_obj_track(self, already_touched_obj_ids, new_obj_instance):
         obj_id_with_sufficient_similarity = None
         highest_similarity = 0
-        for obj_id, obj_track in self.objects.items():
+        for obj_id, obj_track in self.get_active_object_tracks().items():
             if obj_id not in already_touched_obj_ids:
                 similarity_to_current_obj = obj_track.similarity_to(new_obj_instance, over_n_instances=KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)
                 if similarity_to_current_obj > highest_similarity:
@@ -62,6 +66,6 @@ class DetectedObjects:
         return obj_id_with_sufficient_similarity
 
     def _delete_old_object_tracks(self):
-        ids_to_delete = [key for key, obj_track in self.objects.items() if not obj_track.was_present_in_last_n_frames(KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)]
-        for key in ids_to_delete:
-            del self.objects[key]
+        obj_tracks_to_deactivate = [obj_track for key, obj_track in self.get_active_object_tracks().items() if not obj_track.was_present_in_last_n_frames(KEEP_TRACK_OF_OBJS_FOR_N_FRAMES)]
+        for track in obj_tracks_to_deactivate:
+            track.active = False
