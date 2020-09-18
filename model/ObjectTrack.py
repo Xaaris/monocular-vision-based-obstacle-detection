@@ -1,8 +1,9 @@
 import operator
 from typing import Optional
 
-from Constants import MATCHER_TYPE, MatcherType
+from Constants import MATCHER_TYPE, MatcherType, INPUT_FPS
 from matcher.KalmanTracker import KalmanTracker
+from mrcnn.CocoClasses import is_static
 
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
@@ -65,6 +66,21 @@ class ObjectTrack:
                 return occurrence.similarity_to(obj_instance)
         # Object did not appear in last 5 frames
         return 0
+
+    def get_velocity(self, over_n_instances: int = INPUT_FPS):
+        if not self.active or not self.is_present():
+            return None
+        elif is_static(self.class_name):
+            return 0, 0, 0
+        else:
+            last_n_occurrences = self.occurrences[- over_n_instances:]  # Getting last (max) n occurrences of this object
+            last_n_occurrences_filtered = [x for x in last_n_occurrences if x is not None]  # Filtering for non None values
+            last_positions = list(map(lambda x: x.get_3d_position(), last_n_occurrences_filtered))  # mapping to positions of this object
+            differences = tuple(map(lambda p1, p2: tuple(map(operator.sub, p1, p2)), last_positions[:-1], last_positions[1:]))  # building pairwise differences
+            cumulative_translation = tuple(map(sum, zip(*differences)))  # Adding up all the differences
+            smoothed_translation = tuple(map(lambda x: x/len(last_n_occurrences), cumulative_translation))  # dividing by number of instances / frames since first appearance
+            translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))
+            return translation_in_meter_per_second
 
     def get_trajectory(self, over_n_instances: int = 5) -> tuple:
         """Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames"""

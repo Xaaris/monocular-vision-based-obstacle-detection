@@ -10,6 +10,7 @@ Adapted by Johannes Berger
 """
 
 import colorsys
+import math
 import random
 
 import cv2
@@ -68,6 +69,10 @@ def draw_instances(image,
         # print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
 
         if obj_track.is_present():
+
+            velocity_rounded = tuple(map(lambda e: round(e, 2), obj_track.get_velocity()))
+            speed = round(math.sqrt(sum([e**2 for e in velocity_rounded])), 2)
+            print(obj_track.class_name, obj_id, len(obj_track.occurrences), velocity_rounded, speed)
 
             current_instance = obj_track.get_current_instance()
 

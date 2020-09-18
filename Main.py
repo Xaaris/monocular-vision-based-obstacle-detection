@@ -9,7 +9,7 @@ def main():
                                         Constants.MATCHER_TYPE.value,
                                         Constants.FROM_SEC_OR_IMAGE,
                                         Constants.TO_SEC_OR_IMAGE,
-                                        Constants.FPS,
+                                        Constants.OUTPUT_FPS,
                                         Constants.INPUT_DIMENSIONS)
     detected_objects = DetectedObjects()
 
@@ -56,6 +56,7 @@ if __name__ == "__main__":
                         choices=list(Constants.CameraType),
                         default=Constants.CameraType.IPHONE_XR_4K_60,
                         help="Camera type can be IPHONE_XR_4K_60 or IPHONE_8_PLUS_4K_60")
+    parser.add_argument("--inputFps", dest="inputFps", type=int, default=60, help="Fps of input video")
     parser.add_argument("--outputFps", dest="outputFps", type=int, default=10, help="Fps for output video")
 
     args = parser.parse_args()
@@ -66,9 +67,11 @@ if __name__ == "__main__":
     Constants.TO_SEC_OR_IMAGE = args.to_sec_or_image
     Constants.INPUT_DATA_TYPE = args.inputType
     Constants.INPUT_DIMENSIONS = tuple(args.inputDimensions)
+    Constants.VIDEO_SCALE = args.inputScale
     Constants.MATCHER_TYPE = args.matcherType
     Constants.CAMERA_TYPE = args.cameraType
-    Constants.FPS = args.outputFps
+    Constants.INPUT_FPS = args.inputFps
+    Constants.OUTPUT_FPS = args.outputFps
 
     # Constants need to be set before imports so that they are taken into account
     from model.DetectedObjects import DetectedObjects
@@ -77,5 +80,6 @@ if __name__ == "__main__":
     from mrcnn.Mask_R_CNN_COCO import detect
     from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames
     from utils.timer import print_timing_results
+    from utils.export_utils import write_detected_objects_to_csv
 
     main()
