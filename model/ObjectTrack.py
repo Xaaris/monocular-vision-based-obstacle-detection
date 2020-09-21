@@ -31,7 +31,7 @@ class ObjectTrack:
         self.kalman_tracker.update(center_or_none)
         if self.is_present():
             velocity = self.get_velocity()
-            speed = self.calculate_spped_from_velocity(velocity)
+            speed = self.calculate_speed_from_velocity(velocity)
             self.get_current_instance().velocity = velocity
             self.get_current_instance().speed = speed
 
@@ -75,6 +75,11 @@ class ObjectTrack:
         return 0
 
     def get_velocity(self, over_n_instances: int = INPUT_FPS):
+        """
+        Calculates the velocity for the axis x, y, and z in m/s
+        Returns None if object did not appear in the current frame
+        Returns (0,0,0) in case of static objects such as traffic lights
+        """
         if not self.active or not self.is_present():
             return None
         elif is_static(self.class_name):
@@ -89,7 +94,7 @@ class ObjectTrack:
             translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))
             return translation_in_meter_per_second
 
-    def calculate_spped_from_velocity(self, velocity) -> Optional[float]:
+    def calculate_speed_from_velocity(self, velocity) -> Optional[float]:
         """Returns the current estimated speed in km/h if a velocity could be calculated beforehand, else None"""
         return None if velocity is None else math.sqrt(sum([e ** 2 for e in velocity])) * 3.6
 
