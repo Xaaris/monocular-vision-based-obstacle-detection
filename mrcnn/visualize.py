@@ -66,15 +66,11 @@ def draw_instances(image,
     result_image = image.copy()
 
     for obj_id, obj_track in detected_objects.objects.items():
-        # print(obj_track.class_name, obj_id, obj_track.is_present(), obj_track.get_position_uncertainty())
 
         if obj_track.is_present():
 
-            velocity_rounded = tuple(map(lambda e: round(e, 2), obj_track.get_velocity()))
-            speed = round(math.sqrt(sum([e**2 for e in velocity_rounded])), 2)
-            print(obj_track.class_name, obj_id, len(obj_track.occurrences), velocity_rounded, speed)
-
             current_instance = obj_track.get_current_instance()
+            print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2)if current_instance.speed is not None else None)
 
             color = static_colors[obj_id % max_number_of_colors]
 

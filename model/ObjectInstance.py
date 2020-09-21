@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass, field
+from typing import Tuple, Optional
 
 import cv2
 import numpy as np
@@ -24,6 +25,8 @@ class ObjectInstance:
     class_name: str
     roi: Box
     confidence_score: float
+    velocity: Optional[Tuple[float, float, float]]
+    speed: Optional[float]
     mask: [[]]
     keypoints: [KeyPoint] = field(default_factory=list)
     descriptors: np.ndarray = None
@@ -105,7 +108,14 @@ def create_objects(result, frame) -> [ObjectInstance]:
 
         keypoints, descriptors = get_keypoints_and_descriptors_for_object(frame_gray, mask)
         # show(drawKeypoints(frame, keypoints, None))
-        detected_object = ObjectInstance(class_name, box, confidence_score, mask, keypoints, descriptors)
+        detected_object = ObjectInstance(class_name,
+                                         box,
+                                         confidence_score,
+                                         velocity=None,
+                                         speed=None,
+                                         mask=mask,
+                                         keypoints=keypoints,
+                                         descriptors=descriptors)
         objects.append(detected_object)
 
     return objects

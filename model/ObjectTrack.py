@@ -1,3 +1,4 @@
+import math
 import operator
 from typing import Optional
 
@@ -28,6 +29,12 @@ class ObjectTrack:
         self.occurrences.append(new_obj_instance)
         center_or_none = None if new_obj_instance is None else new_obj_instance.roi.get_center()
         self.kalman_tracker.update(center_or_none)
+        if self.is_present():
+            velocity = self.get_velocity()
+            speed = self.calculate_spped_from_velocity(velocity)
+            self.get_current_instance().velocity = velocity
+            self.get_current_instance().speed = speed
+
 
     def get_next_position_prediction(self):
         return self.kalman_tracker.next_position_prediction()
@@ -81,6 +88,10 @@ class ObjectTrack:
             smoothed_translation = tuple(map(lambda x: x/len(last_n_occurrences), cumulative_translation))  # dividing by number of instances / frames since first appearance
             translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))
             return translation_in_meter_per_second
+
+    def calculate_spped_from_velocity(self, velocity) -> Optional[float]:
+        """Returns the current estimated speed in km/h if a velocity could be calculated beforehand, else None"""
+        return None if velocity is None else math.sqrt(sum([e ** 2 for e in velocity])) * 3.6
 
     def get_trajectory(self, over_n_instances: int = 5) -> tuple:
         """Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames"""
