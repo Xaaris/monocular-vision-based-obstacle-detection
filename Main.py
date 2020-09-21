@@ -31,7 +31,7 @@ def main():
 
     output_video.release()
     print_timing_results()
-
+    write_detected_objects_to_csv(detected_objects, "test")
 
 
 
