@@ -10,7 +10,6 @@ Adapted by Johannes Berger
 """
 
 import colorsys
-import math
 import random
 
 import cv2
@@ -70,7 +69,7 @@ def draw_instances(image,
         if obj_track.is_present():
 
             current_instance = obj_track.get_current_instance()
-            print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2)if current_instance.speed is not None else None)
+            print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2) if current_instance.speed is not None else None)
 
             color = static_colors[obj_id % max_number_of_colors]
 
@@ -102,11 +101,11 @@ def draw_instances(image,
                 mask = current_instance.mask
                 result_image = apply_mask(result_image, mask, color)
 
-            # Trajectory
-            trajectory = obj_track.get_trajectory()
-            if show_trajectory and trajectory:
+            # Trajectory based on velocity (multiplied by 5 for better visualization)
+            velocity = current_instance.velocity
+            if show_trajectory and velocity:
                 center = box.get_center()
-                arrow_head = (int(center[0] + trajectory[0] * 100), int(center[1] + trajectory[1] * 100))
+                arrow_head = (int(center[0] + velocity[0] * 5), int(center[1] + velocity[1] * 5))
                 cv2.arrowedLine(result_image, center, arrow_head, (0, 0, 255), 2)
 
             # Kalman next step prediction

@@ -1,8 +1,8 @@
 import math
 import operator
-from typing import Optional
+from typing import Optional, Tuple
 
-from Constants import MATCHER_TYPE, MatcherType, INPUT_FPS
+from Constants import MATCHER_TYPE, MatcherType, INPUT_FPS, CAMERA_TYPE, VIDEO_SCALE
 from matcher.KalmanTracker import KalmanTracker
 from mrcnn.CocoClasses import is_static
 
@@ -30,6 +30,7 @@ class ObjectTrack:
         center_or_none = None if new_obj_instance is None else new_obj_instance.roi.get_center()
         self.kalman_tracker.update(center_or_none)
         if self.is_present():
+            self.get_current_instance().translation_to_last_instance = self.get_translation_to_last_instance()
             velocity = self.get_velocity()
             speed = self.calculate_speed_from_velocity(velocity)
             self.get_current_instance().velocity = velocity
@@ -74,6 +75,9 @@ class ObjectTrack:
         # Object did not appear in last 5 frames
         return 0
 
+    def is_static(self):
+        return is_static(self.class_name)
+
     def get_velocity(self, over_n_instances: int = INPUT_FPS):
         """
         Calculates the velocity for the axis x, y, and z in m/s
@@ -82,27 +86,60 @@ class ObjectTrack:
         """
         if not self.active or not self.is_present():
             return None
-        elif is_static(self.class_name):
-            return 0, 0, 0
         else:
             last_n_occurrences = self.occurrences[- over_n_instances:]  # Getting last (max) n occurrences of this object
             last_n_occurrences_filtered = [x for x in last_n_occurrences if x is not None]  # Filtering for non None values
-            last_positions = list(map(lambda x: x.get_3d_position(), last_n_occurrences_filtered))  # mapping to positions of this object
-            differences = tuple(map(lambda p1, p2: tuple(map(operator.sub, p1, p2)), last_positions[:-1], last_positions[1:]))  # building pairwise differences
-            cumulative_translation = tuple(map(sum, zip(*differences)))  # Adding up all the differences
+            last_translations = list(map(lambda x: x.translation_to_last_instance, last_n_occurrences_filtered))  # mapping to positions of this object
+            last_translations_filtered = [x for x in last_translations if x is not None]  # Filtering for non None values
+            cumulative_translation = tuple(map(sum, zip(*last_translations_filtered)))  # Adding up all the differences
             smoothed_translation = tuple(map(lambda x: x/len(last_n_occurrences), cumulative_translation))  # dividing by number of instances / frames since first appearance
-            translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))
+            translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))  # Multiplying by fps to get m/s
             return translation_in_meter_per_second
 
     def calculate_speed_from_velocity(self, velocity) -> Optional[float]:
         """Returns the current estimated speed in km/h if a velocity could be calculated beforehand, else None"""
         return None if velocity is None else math.sqrt(sum([e ** 2 for e in velocity])) * 3.6
 
-    def get_trajectory(self, over_n_instances: int = 5) -> tuple:
+    def get_previous_present_instance(self) -> Optional[ObjectInstance]:
+        """Returns the last present occurrence or None if there was none"""
+        all_but_current_instance = list(reversed(self.occurrences[:-1]))
+        for instance in all_but_current_instance:
+            if instance is not None:
+                return instance
+
+    def get_translation_to_last_instance(self) -> Optional[Tuple[float, float, float]]:
+        """
+        Returns the translation in (x,y,z) in meter compared to the last present instance based on keypoint matches
+        and difference in distance
+        """
+        if len(self.occurrences) >= 2 and self.is_present():
+            current_instance = self.get_current_instance()
+            previous_instance = self.get_previous_present_instance()
+
+            if current_instance is not None and current_instance.descriptors is not None and previous_instance is not None and previous_instance.descriptors is not None:
+                matches = get_matches(current_instance.descriptors, previous_instance.descriptors)
+                if matches:  # one or more matches
+                    cumulative_2d_translation_in_px = (0, 0)
+                    for match in matches:
+                        kp_idx_current = match.queryIdx
+                        kp_idx_last = match.trainIdx
+                        key_point_current = current_instance.keypoints[kp_idx_current].pt
+                        key_point_last = previous_instance.keypoints[kp_idx_last].pt
+                        translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
+                        cumulative_2d_translation_in_px = tuple(map(operator.add, cumulative_2d_translation_in_px, translation))  # add them up
+                    average_2d_translation_in_px = tuple(map(lambda e: e / len(matches), cumulative_2d_translation_in_px))  # div by length
+                    lens_factor = CAMERA_TYPE.value[0] * VIDEO_SCALE
+                    x, y = tuple(map(lambda e: e / lens_factor, average_2d_translation_in_px))  # div by lensFactor to get real world measurements
+
+                    z = current_instance.approximate_distance() - previous_instance.approximate_distance()
+                    return x, y, z
+
+
+    def get_2d_trajectory(self, over_n_instances: int = 5) -> Optional[Tuple[float, float]]:
         """Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames"""
         if len(self.occurrences) >= 2:
             last_n_instances = list(reversed(self.occurrences[-over_n_instances:]))
-            smoothed_translation = (0, 0)
+            smoothed_translation = (0.0, 0.0)
             for i in range(len(last_n_instances) - 1):
                 current = last_n_instances[i]
                 last = last_n_instances[i + 1]
@@ -132,4 +169,4 @@ class ObjectTrack:
                f"present in last 5 frames: {self.was_present_in_last_n_frames(5)}, " \
                f"next predicted pos: {self.get_next_position_prediction()}, " \
                f"pos uncertainty: {self.get_next_position_uncertainty()}," \
-               f"trajectory: {self.get_trajectory()}"
+               f"trajectory: {self.get_2d_trajectory()}"

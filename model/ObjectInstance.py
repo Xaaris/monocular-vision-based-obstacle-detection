@@ -25,6 +25,7 @@ class ObjectInstance:
     class_name: str
     roi: Box
     confidence_score: float
+    translation_to_last_instance: Optional[Tuple[float, float, float]]
     velocity: Optional[Tuple[float, float, float]]
     speed: Optional[float]
     mask: [[]]
@@ -111,6 +112,7 @@ def create_objects(result, frame) -> [ObjectInstance]:
         detected_object = ObjectInstance(class_name,
                                          box,
                                          confidence_score,
+                                         translation_to_last_instance=None,
                                          velocity=None,
                                          speed=None,
                                          mask=mask,
