@@ -17,7 +17,7 @@ class DetectedObjects:
         return self.nextObjectID
 
     def get_active_object_tracks(self) -> Dict[int, ObjectTrack]:
-        return {key: track for key, track in self.objects.items() if track.active is True}
+        return {key: track for key, track in self.objects.items() if track.active}
 
 
     def add_objects(self, new_objects):
