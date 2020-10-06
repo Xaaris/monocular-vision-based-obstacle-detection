@@ -82,7 +82,6 @@ class ObjectTrack:
         """
         Calculates the velocity for the axis x, y, and z in m/s
         Returns None if object did not appear in the current frame
-        Returns (0,0,0) in case of static objects such as traffic lights
         """
         if not self.active or not self.is_present():
             return None
@@ -92,7 +91,7 @@ class ObjectTrack:
             last_translations = list(map(lambda x: x.translation_to_last_instance, last_n_occurrences_filtered))  # mapping to positions of this object
             last_translations_filtered = [x for x in last_translations if x is not None]  # Filtering for non None values
             cumulative_translation = tuple(map(sum, zip(*last_translations_filtered)))  # Adding up all the differences
-            smoothed_translation = tuple(map(lambda x: x/len(last_n_occurrences), cumulative_translation))  # dividing by number of instances / frames since first appearance
+            smoothed_translation = tuple(map(lambda x: x / (len(last_n_occurrences) - 1), cumulative_translation))  # dividing by number of instances / frames since first appearance
             translation_in_meter_per_second = tuple(map(lambda x: x * INPUT_FPS, smoothed_translation))  # Multiplying by fps to get m/s
             return translation_in_meter_per_second
 
@@ -128,12 +127,20 @@ class ObjectTrack:
                         translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
                         cumulative_2d_translation_in_px = tuple(map(operator.add, cumulative_2d_translation_in_px, translation))  # add them up
                     average_2d_translation_in_px = tuple(map(lambda e: e / len(matches), cumulative_2d_translation_in_px))  # div by length
-                    lens_factor = CAMERA_TYPE.value[0] * VIDEO_SCALE
-                    x, y = tuple(map(lambda e: e / lens_factor, average_2d_translation_in_px))  # div by lensFactor to get real world measurements
 
-                    z = current_instance.approximate_distance() - previous_instance.approximate_distance()
+                    current_distance = current_instance.approximate_distance()
+                    previous_distance = previous_instance.approximate_distance()
+                    z = current_distance - previous_distance
+
+                    x, y = tuple(map(lambda px: self._pixel_to_meter(px, previous_distance + 0.5 * z), average_2d_translation_in_px))  # div by lensFactor to get real world measurements
+
                     return x, y, z
 
+    def _pixel_to_meter(self, pixel: float, at_distance: float) -> float:
+        pixel_per_meter_at_1_m = 100 * CAMERA_TYPE.value[0] * VIDEO_SCALE
+        pixel_per_meter_at_distance = pixel_per_meter_at_1_m / at_distance
+        meter = pixel / pixel_per_meter_at_distance
+        return meter
 
     def get_2d_trajectory(self, over_n_instances: int = 5) -> Optional[Tuple[float, float]]:
         """Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames"""
