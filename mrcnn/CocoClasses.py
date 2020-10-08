@@ -10,7 +10,7 @@ class CocoClass:
 
 coco_classes = [
     CocoClass('BG', True, (100, 100)),  # Background
-    CocoClass('person', False, (50, 180)),
+    CocoClass('person', False, (60, 180)),
     CocoClass('bicycle', False, (150, 100)),
     CocoClass('car', False, (300, 170)),
     CocoClass('motorcycle', False, (180, 120)),

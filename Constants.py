@@ -25,6 +25,7 @@ class CameraType(Enum):
     # 3. value: Field of view vertical: Field of view in degrees in y dimension
     IPHONE_8_PLUS_4K_60 = (32.8, 66, 40)  # rough estimation
     IPHONE_XR_4K_60 = (31.2, 62.76, 38.58)
+    FL2_14S3C_C = (7.1, 90, 35)  # Camera used in kitti dataset
 
     def __str__(self):
         return self.name
