@@ -6,12 +6,13 @@ from model.DetectedObjects import DetectedObjects
 
 
 def read_kitti_label_file(frame: str):
-    path = f"data/imageSet/kitti/100/{frame}.txt"
+    path = f"data/imageSet/kitti/1000/{frame}.txt"
     full_path = os.path.abspath(path)
     df_labels = pd.read_csv(full_path,
                             delim_whitespace=True,
                             names=["type", "truncated", "occluded", "alpha", "bbox_left", "bbox_top", "bbox_right", "bbox_bottom", "dimensions_height", "dimensions_width", "dimensions_length", "location_x", "location_y", "location_z", "rotation_y"])
     df_labels_clean = df_labels.drop(["DontCare"], errors="ignore")
+    df_labels_clean["location_y"] = df_labels_clean["location_y"] - df_labels_clean["dimensions_height"] / 2  # y seems to be set to bottom of object in kitti dataset for some reason
     del df_labels_clean["truncated"]
     del df_labels_clean["occluded"]
     del df_labels_clean["alpha"]
@@ -66,7 +67,6 @@ def compute_iou(my_obj, kitti_obj):
 
     iou = _intersection_over_union(my_box, kitti_box)
     return iou
-
 
 
 def _intersection_over_union(boxA, boxB):
