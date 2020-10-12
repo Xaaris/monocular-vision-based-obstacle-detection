@@ -55,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument("--cameraType", dest="cameraType", type=Constants.CameraType,
                         choices=list(Constants.CameraType),
                         default=Constants.CameraType.IPHONE_XR_4K_60,
-                        help="Camera type can be IPHONE_XR_4K_60 or IPHONE_8_PLUS_4K_60")
+                        help="Camera type can be IPHONE_XR_4K_60, IPHONE_8_PLUS_4K_60 or FL2_14S3C_C")
     parser.add_argument("--inputFps", dest="inputFps", type=int, default=60, help="Fps of input video")
     parser.add_argument("--outputFps", dest="outputFps", type=int, default=10, help="Fps for output video")
 
