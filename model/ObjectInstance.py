@@ -100,6 +100,9 @@ def create_objects(result, frame) -> [ObjectInstance]:
 
         confidence_score = result["scores"][i]
         class_name = get_class_name_for_id(result["class_ids"][i])
+        # Filter for relevant classes
+        if class_name not in ["car", "truck", "person", "bus", "train", "bicycle"]:
+            continue
 
         roi = result["rois"][i]
         y1, x1, y2, x2 = roi

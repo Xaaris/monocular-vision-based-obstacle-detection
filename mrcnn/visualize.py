@@ -48,12 +48,12 @@ def apply_mask(image, mask, color, alpha=0.5):
 def draw_instances(image,
                    detected_objects: DetectedObjects,
                    show_mask=True,
-                   show_bbox=False,
-                   show_label=False,
-                   show_trajectory=True,
-                   show_confidence_score=True,
-                   show_distance=False,
-                   show_3d_position=False,
+                   show_bbox=True,
+                   show_label=True,
+                   show_trajectory=False,
+                   show_confidence_score=False,
+                   show_distance=True,
+                   show_3d_position=True,
                    show_kalman_next_prediction_area=False,
                    show_kalman_last_prediction_area=False):
     """
@@ -69,7 +69,7 @@ def draw_instances(image,
         if obj_track.is_present():
 
             current_instance = obj_track.get_current_instance()
-            print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2) if current_instance.speed is not None else None)
+            # print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2) if current_instance.speed is not None else None)
 
             color = static_colors[obj_id % max_number_of_colors]
 
@@ -92,7 +92,7 @@ def draw_instances(image,
                 if show_distance:
                     label_text += f"dist: {current_instance.approximate_distance() : .1f} "
                 if show_3d_position:
-                    label_text += f"3D pos: {current_instance.get_3d_position()} "
+                    label_text += f"3D pos: {tuple(map(lambda e: round(e, 1), current_instance.get_3d_position()))} "
                 cv2.putText(result_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
                             color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 

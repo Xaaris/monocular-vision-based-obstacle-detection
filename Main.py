@@ -5,33 +5,37 @@ import Constants
 
 
 def main():
-    output_video = prepare_video_output(Constants.INPUT_PATH,
-                                        Constants.MATCHER_TYPE.value,
-                                        Constants.FROM_SEC_OR_IMAGE,
-                                        Constants.TO_SEC_OR_IMAGE,
-                                        Constants.OUTPUT_FPS,
-                                        Constants.INPUT_DIMENSIONS)
-    detected_objects = DetectedObjects()
+    # output_video = prepare_video_output(Constants.INPUT_PATH,
+    #                                     Constants.MATCHER_TYPE.value,
+    #                                     Constants.FROM_SEC_OR_IMAGE,
+    #                                     Constants.TO_SEC_OR_IMAGE,
+    #                                     Constants.OUTPUT_FPS,
+    #                                     Constants.INPUT_DIMENSIONS)
+    kitti_evaluator = KittiEvaluator()
 
     for frame_number, frame in enumerate(get_frames(Constants.INPUT_DATA_TYPE,
                                                     Constants.INPUT_PATH,
                                                     Constants.FROM_SEC_OR_IMAGE,
                                                     Constants.TO_SEC_OR_IMAGE)):
+        # clear detected objects for kitti test
+        detected_objects = DetectedObjects()
         result = detect(frame)
 
         newly_detected_objects = create_objects(result, frame)
         detected_objects.add_objects(newly_detected_objects)
 
-        result_frame = visualize.draw_instances(frame, detected_objects)
+        # result_frame = visualize.draw_instances(frame, detected_objects)
 
-        print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
-        show(result_frame, "Frame", await_keypress=False)
-        asyncio.run(save_debug_image(result_frame, "frame_" + str(frame_number)))
-        output_video.write(result_frame)
+        # print(f"Frame {frame_number}: detected {len(newly_detected_objects)} objects. {len(detected_objects.objects)} total objects")
+        # show(result_frame, "Frame", await_keypress=False)
+        # asyncio.run(save_debug_image(result_frame, "frame_" + str(frame_number)))
+        # output_video.write(result_frame)
+        kitti_evaluator.compute_result(frame_number, detected_objects)
 
-    output_video.release()
+    # output_video.release()
     print_timing_results()
-    write_detected_objects_to_csv(detected_objects, "test")
+    kitti_evaluator.write_results_as_csv()
+    # write_detected_objects_to_csv(detected_objects, "9,90kmh_BIG_new_algo")
 
 
 
@@ -54,8 +58,8 @@ if __name__ == "__main__":
                         default=Constants.MatcherType.ORB, help="Matcher type can be SIFT, SURF or ORB")
     parser.add_argument("--cameraType", dest="cameraType", type=Constants.CameraType,
                         choices=list(Constants.CameraType),
-                        default=Constants.CameraType.IPHONE_XR_4K_60,
-                        help="Camera type can be IPHONE_XR_4K_60 or IPHONE_8_PLUS_4K_60")
+                        default=Constants.CameraType.FL2_14S3C_C,
+                        help="Camera type can be IPHONE_XR_4K_60, IPHONE_8_PLUS_4K_60 or FL2_14S3C_C")
     parser.add_argument("--inputFps", dest="inputFps", type=int, default=60, help="Fps of input video")
     parser.add_argument("--outputFps", dest="outputFps", type=int, default=10, help="Fps for output video")
 
@@ -81,5 +85,6 @@ if __name__ == "__main__":
     from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames
     from utils.timer import print_timing_results
     from utils.export_utils import write_detected_objects_to_csv
+    from utils.KittiEvaluator import KittiEvaluator
 
     main()
