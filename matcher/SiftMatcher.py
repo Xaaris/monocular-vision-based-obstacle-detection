@@ -5,12 +5,9 @@ from utils.timer import timing
 SIFT = cv2.xfeatures2d.SIFT_create()
 
 # FLANN parameters
-FLANN_INDEX_KDTREE = 0
 MIN_NUMBER_OF_MATCHES = 2
-index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-search_params = dict(checks=50)  # or pass empty dictionary
 
-flann = cv2.FlannBasedMatcher(index_params, search_params)
+KNN_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_BRUTEFORCE)
 
 
 @timing
@@ -35,7 +32,8 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     # sum distances
     total_distance = sum([m.distance for m in matches])
     # divide by number of matches
-    return (total_distance / len(matches)) / 10 if len(matches) > 0 else 100
+    avg_distance = (total_distance / len(matches)) / 512 if len(matches) > 0 else 100
+    return avg_distance
 
 
 @timing
@@ -45,7 +43,7 @@ def get_keypoints_and_descriptors_for_object(graysclae_image, mask):
 
 
 def _get_matches(descriptor_a, descriptor_b):
-    knn_matches = flann.knnMatch(descriptor_a, descriptor_b, MIN_NUMBER_OF_MATCHES)
+    knn_matches = KNN_DESCRIPTOR_MATCHER.knnMatch(descriptor_a, descriptor_b, MIN_NUMBER_OF_MATCHES)
 
     # D. Lowe's ration test (https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf)
     ratio_thresh = 0.7

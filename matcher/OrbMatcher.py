@@ -29,7 +29,8 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     # sum distances
     total_distance = sum([d.distance for d in matches])
     # divide by number of matches
-    return total_distance / len(matches)
+    avg_distance = total_distance / len(matches) / 100
+    return avg_distance
 
 
 @timing

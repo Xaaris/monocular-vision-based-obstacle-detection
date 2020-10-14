@@ -6,7 +6,7 @@ HESSIAN_THRESHOLD = 400
 MIN_NUMBER_OF_MATCHES = 2
 SURF = cv2.xfeatures2d.SURF_create(HESSIAN_THRESHOLD, upright=True)
 
-KNN_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_FLANNBASED)
+KNN_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DescriptorMatcher_BRUTEFORCE)
 
 
 @timing
@@ -31,7 +31,8 @@ def average_descriptor_distance(descriptor_a, descriptor_b) -> float:
     # sum distances
     total_distance = sum([m.distance for m in matches])
     # divide by number of matches
-    return total_distance / len(matches) if len(matches) > 0 else 100
+    avg_distance = total_distance / len(matches) if len(matches) > 0 else 100
+    return avg_distance
 
 
 @timing

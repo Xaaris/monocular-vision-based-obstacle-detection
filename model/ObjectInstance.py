@@ -38,8 +38,7 @@ class ObjectInstance:
             return 0
         # Check if descriptors match
         average_distance = average_descriptor_distance(self.descriptors, obj_instance.descriptors)
-        normalized_distance = average_distance / 100  # normalize?
-        return max(0.0, 1 - normalized_distance)
+        return max(0.0, 1 - average_distance)
 
     def approximate_distance(self) -> float:
         """:returns rough estimation of distance to the object in meters"""
