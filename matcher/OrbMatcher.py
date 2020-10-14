@@ -2,7 +2,7 @@ import cv2
 
 from utils.timer import timing
 
-MAX_FEATURES = 200
+MAX_FEATURES = 500
 ORB = cv2.ORB_create(MAX_FEATURES)
 
 SIMPLE_DESCRIPTOR_MATCHER = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
