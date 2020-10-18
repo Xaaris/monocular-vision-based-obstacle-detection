@@ -16,7 +16,8 @@ def main():
     for frame_number, frame in enumerate(get_frames(Constants.INPUT_DATA_TYPE,
                                                     Constants.INPUT_PATH,
                                                     Constants.FROM_SEC_OR_IMAGE,
-                                                    Constants.TO_SEC_OR_IMAGE)):
+                                                    Constants.TO_SEC_OR_IMAGE,
+                                                    undistort=True)):
         result = detect(frame)
 
         newly_detected_objects = create_objects(result, frame)

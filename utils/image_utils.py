@@ -6,7 +6,8 @@ import cv2.cv2 as cv2
 from cv2.cv2 import VideoWriter
 from moviepy.video.io.VideoFileClip import VideoFileClip
 
-from Constants import InputDataType
+from Constants import InputDataType, CAMERA_TYPE
+from camera_calibration.CameraCalibration import CameraCalibration
 
 
 def letterbox_image(image, desired_size):
@@ -86,31 +87,37 @@ async def save_debug_image(image, filename, folder=None, resize_to=None):
     cv2.imwrite(path, image)
 
 
-def get_frames(input_type, path, from_sec_or_image=0, to_sec_or_image=None):
+def get_frames(input_type, path, from_sec_or_image=0, to_sec_or_image=None, undistort=False):
     if input_type == InputDataType.VIDEO:
-        return get_frames_from_video(path, from_sec_or_image, to_sec_or_image)
+        return get_frames_from_video(path, from_sec_or_image, to_sec_or_image, undistort)
     elif input_type == InputDataType.IMAGE:
-        return get_frames_from_image_directory(path, from_image=from_sec_or_image, to_image=to_sec_or_image)
+        return get_frames_from_image_directory(path, from_image=from_sec_or_image, to_image=to_sec_or_image, undistort=undistort)
     else:
         raise Exception("Unknown input_type")
 
 
-def get_frames_from_video(path_to_video, from_sec=0, to_sec=None):
+def get_frames_from_video(path_to_video, from_sec=0, to_sec=None, undistort=False):
     """
     Generator that reads a video file from disk and yields a color correct frame at a time
     """
+    camera_calibration = CameraCalibration(CAMERA_TYPE)
+
     fullpath = os.path.abspath(path_to_video)
     video = VideoFileClip(fullpath, audio=False).subclip(from_sec, to_sec)
     for frame in video.iter_frames():
         # We have to switch the order of channels as opencv has a different order as they are coming from the camera
         color_corrected_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        if undistort:
+            color_corrected_frame = camera_calibration.undistort(color_corrected_frame)
         yield color_corrected_frame
 
 
-def get_frames_from_image_directory(path, image_types=None, from_image=0, to_image=None):
+def get_frames_from_image_directory(path, image_types=None, from_image=0, to_image=None, undistort=False):
     """
     Generator that reads a directory of images from disk and yields a image at a time
     """
+    camera_calibration = CameraCalibration(CAMERA_TYPE)
+
     if image_types is None:
         image_types = ["png", "jpg"]
     full_path_to_dir = os.path.abspath(path)
@@ -120,6 +127,8 @@ def get_frames_from_image_directory(path, image_types=None, from_image=0, to_ima
     image_paths.sort()
     for image_path in image_paths[from_image:to_image]:
         image = cv2.imread(image_path)
+        if undistort:
+            image = camera_calibration.undistort(image)
         yield image
 
 
