@@ -77,7 +77,7 @@ def calculate_camera_matrix_and_distortion_coefficients(camera_model_name):
     h, w = gray.shape[:2]
     camera_matrix_with_crop, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, distortion_coeffs, (w, h), 1, (w, h))
 
-    file_name = "camera_calibration_%s.npz" % camera_model_name
+    file_name = f"camera_calibration_{camera_model_name}.npz"
     np.savez(file_name, camera_matrix=camera_matrix, distortion_coeffs=distortion_coeffs, camera_matrix_with_crop=camera_matrix_with_crop)
 
 

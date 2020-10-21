@@ -2,9 +2,11 @@ import argparse
 import asyncio
 
 import Constants
+from utils.timer import print_timing_results, timing
 
 
-def main():
+@timing
+def process_video():
     output_video = prepare_video_output(Constants.INPUT_PATH,
                                         Constants.MATCHER_TYPE.value,
                                         Constants.FROM_SEC_OR_IMAGE,
@@ -31,9 +33,12 @@ def main():
         output_video.write(result_frame)
 
     output_video.release()
-    print_timing_results()
     write_detected_objects_to_csv(detected_objects, "test")
 
+
+def main():
+    process_video()
+    print_timing_results()
 
 
 if __name__ == "__main__":
@@ -80,7 +85,6 @@ if __name__ == "__main__":
     from mrcnn import visualize
     from mrcnn.Mask_R_CNN_COCO import detect
     from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames
-    from utils.timer import print_timing_results
     from utils.export_utils import write_detected_objects_to_csv
 
     main()
