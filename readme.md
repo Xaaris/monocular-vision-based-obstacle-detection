@@ -14,18 +14,21 @@ The inputs dimensions are 640x360 which is 1/6th of the original size.
 
 ### Here are some examples (click of the gifs to get to a higher quality video): 
 [![Example video 1](./../images/images/example_1.gif?raw=true)](https://youtu.be/LYG21iKl7QE)
-[![Example video 1](./../images/images/example_2.gif?raw=true)](https://youtu.be/ayhgmKT8KWM)
-[![Example video 1](./../images/images/example_3.gif?raw=true)](https://youtu.be/tHlel_Hwfm0)
+Scenario 1: Static camera with moving objects
 
-![Example video](./../images/images/example.gif?raw=true)
+[![Example video 1](./../images/images/example_2.gif?raw=true)](https://youtu.be/ayhgmKT8KWM)
+Scenario 2: Dynamic camera with moving objects. Significant camera shake poses problems to object tracking.
+
+[![Example video 1](./../images/images/example_3.gif?raw=true)](https://youtu.be/tHlel_Hwfm0)
+Scenario 3: Dynamic camera with static objects. The shape of the chair presents challenges to the segmentation network. 
 
 The red arrows are the object's predicted trajectory.
-The faint green crosses in the middle of the objects represents the uncertainty of the Kalman Filter at that step.
+The faint green rectangles in the middle of the objects represents the uncertainty of the Kalman Filter at that step.
 One can see that it shrinks the longer an object is tracked successfully.
 
 
 
 ### Requierements
-- This project requires Python 3.7 as it makes use of the new [Data Classes](https://docs.python.org/3/library/dataclasses.html) but Terraform does not support python 3.8 yet.
+- This project requires Python 3.7 as it makes use of the new [Data Classes](https://docs.python.org/3/library/dataclasses.html) but Keras/Tensorflow do not support python 3.8 yet.
 - This repository uses [Git LFS](https://git-lfs.github.com) to store the large weights files.
 - The python dependencies are listed in the requirements.txt.
