@@ -2,15 +2,15 @@ import os
 
 import cv2
 
+from Constants import MATCHER_TYPE, MatcherType
 from Constants import ROOT_DIR
 
-from Constants import MATCHER_TYPE, MatcherType
 if MATCHER_TYPE == MatcherType.SIFT:
-    from matcher.SiftMatcher import get_matches
+    pass
 elif MATCHER_TYPE == MatcherType.SURF:
-    from matcher.SurfMatcher import get_matches
+    pass
 else:
-    from matcher.OrbMatcher import get_matches
+    pass
 
 from model.DetectedObjects import DetectedObjects
 from model.ObjectInstance import create_objects
@@ -18,12 +18,13 @@ from mrcnn.Mask_R_CNN_COCO import detect
 from utils.image_utils import show
 import numpy as np
 
-IMAGE_PATH_1 = os.path.join(ROOT_DIR, "data/testImages/000000.png")
-IMAGE_PATH_2 = os.path.join(ROOT_DIR, "data/testImages/000001.png")
+IMAGE_PATH_1 = os.path.join(ROOT_DIR, "data/imageSet/dynamic/MOT16-14-small/img1/000001.jpg")
+IMAGE_PATH_2 = os.path.join(ROOT_DIR, "data/imageSet/dynamic/MOT16-14/img1/000001.jpg")
 
 if __name__ == "__main__":
 
-    detected_objects = DetectedObjects()
+    detected_objects1 = DetectedObjects()
+    detected_objects2 = DetectedObjects()
 
     image_1 = cv2.imread(IMAGE_PATH_1)
     image_2 = cv2.imread(IMAGE_PATH_2)
@@ -39,18 +40,17 @@ if __name__ == "__main__":
     if not objects_1 or not objects_2:
         print("Not enough objects found")
 
-    detected_objects.add_objects(objects_1)
-    detected_objects.add_objects(objects_2)
+    detected_objects1.add_objects(objects_1)
+    detected_objects2.add_objects(objects_2)
 
-    for obj_id, detected_object in detected_objects.objects.items():
-        if len(detected_object.occurrences) == 2 \
-                and detected_object.occurrences[0] is not None \
-                and detected_object.occurrences[1] is not None:
+    for obj_id, detected_object in detected_objects1.objects.items():
+        instance = detected_object.get_current_instance()
+        image_1_with_kp = np.copy(image_1)
+        cv2.drawKeypoints(image_1, instance.keypoints, image_1_with_kp)
+        show(image_1_with_kp, await_keypress=True)
 
-            obj_instance_1 = detected_object.occurrences[0]
-            obj_instance_2 = detected_object.occurrences[1]
-
-            for dist in np.linspace(100, 1000, 5):
-                matches = get_matches(obj_instance_1.descriptors, obj_instance_2.descriptors, dist)
-                image_with_matches = cv2.drawMatches(image_1, obj_instance_1.keypoints, image_2, obj_instance_2.keypoints, matches, None)
-                show(image_with_matches, "Matches: dist=" + str(dist), await_keypress=True)
+    for obj_id, detected_object in detected_objects2.objects.items():
+        instance = detected_object.get_current_instance()
+        image_2_with_kp = np.copy(image_2)
+        cv2.drawKeypoints(image_2, instance.keypoints, image_2_with_kp)
+        show(image_2_with_kp, await_keypress=True)
