@@ -6,7 +6,7 @@ These masks are later on used to track objects across multiple video frames with
 Experiments show that while the system is not yet real-time capable, it produces fairly accurate data.
 
 
-### Examples (click of the gifs to get to a higher quality video): 
+### Examples (click on the gifs to get to a higher quality video): 
 [![Example video 1](./../images/images/example_1.gif?raw=true)](https://youtu.be/LYG21iKl7QE)
 Scenario 1: Static camera with moving objects
 
