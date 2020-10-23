@@ -11,10 +11,13 @@ Experiments show that while the system is not yet real-time capable, it produces
 Scenario 1: Static camera with moving objects
 
 [![Example video 1](./../images/images/example_2.gif?raw=true)](https://youtu.be/ayhgmKT8KWM)
-Scenario 2: Dynamic camera with moving objects. Significant camera shake poses problems to object tracking.
+Scenario 2: Dynamic camera with moving objects. Significant camera shake poses problems to object tracking. (Material from the MOT16 dataset)
 
 [![Example video 1](./../images/images/example_3.gif?raw=true)](https://youtu.be/tHlel_Hwfm0)
 Scenario 3: Dynamic camera with static objects. The shape of the chair presents challenges to the segmentation network. 
+
+[![Example video 4](./../images/images/example_4.gif?raw=true)](https://youtu.be/2LUrM7MAVpQ)
+Scenario 1: Static camera with moving objects (Material from the KITTI dataset)
 
 The red arrows are the object's predicted trajectory.
 The faint green rectangles in the middle of the objects represents the uncertainty of the Kalman Filter at that step.
