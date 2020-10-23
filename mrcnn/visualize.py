@@ -15,6 +15,7 @@ import random
 import cv2
 import numpy as np
 
+from Constants import VIDEO_SCALE
 from model.Box import Box
 from model.DetectedObjects import DetectedObjects
 from utils.timer import timing
@@ -35,7 +36,9 @@ def random_colors(number_of_colors, bright=True):
 
 
 def apply_mask(image, mask, color, alpha=0.5):
-    """Apply the given mask to the image.
+    """
+    Apply the given mask to the image.
+    Color an alpha can be customized
     """
     for channel in range(3):
         image[:, :, channel] = np.where(mask == 1,
@@ -48,14 +51,14 @@ def apply_mask(image, mask, color, alpha=0.5):
 def draw_instances(image,
                    detected_objects: DetectedObjects,
                    show_mask=True,
-                   show_bbox=False,
-                   show_label=False,
+                   show_bbox=True,
+                   show_label=True,
                    show_trajectory=True,
-                   show_confidence_score=True,
-                   show_distance=False,
+                   show_confidence_score=False,
+                   show_distance=True,
                    show_3d_position=False,
                    show_kalman_next_prediction_area=False,
-                   show_kalman_last_prediction_area=False):
+                   show_kalman_last_prediction_area=True):
     """
     image: image to copy and illustrate on
     detected_objects: objects to draw
@@ -69,7 +72,13 @@ def draw_instances(image,
         if obj_track.is_present():
 
             current_instance = obj_track.get_current_instance()
-            print(obj_track.class_name, obj_id, len(obj_track.occurrences), tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else None, round(current_instance.speed, 2) if current_instance.speed is not None else None)
+            print(f"{obj_track.class_name}, "
+                  f"id: {obj_id}, "
+                  f"tracked for {len(obj_track.occurrences)} frames, "
+                  f"3D pos: {tuple(map(lambda e: round(e, 2), current_instance.get_3d_position()))}, "
+                  f"distance: {current_instance.approximate_distance() :.2f}m, "
+                  f"velocity: {tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else 'None'}, "
+                  f"speed: {round(current_instance.speed, 2) if current_instance.speed is not None else 'None '}km/h")
 
             color = static_colors[obj_id % max_number_of_colors]
 
@@ -90,7 +99,7 @@ def draw_instances(image,
                 if show_confidence_score:
                     label_text += f"score: {current_instance.confidence_score : .3f} "
                 if show_distance:
-                    label_text += f"dist: {current_instance.approximate_distance() : .1f} "
+                    label_text += f"dist: {current_instance.approximate_distance() : .1f}m "
                 if show_3d_position:
                     label_text += f"3D pos: {current_instance.get_3d_position()} "
                 cv2.putText(result_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
@@ -101,11 +110,12 @@ def draw_instances(image,
                 mask = current_instance.mask
                 result_image = apply_mask(result_image, mask, color)
 
-            # Trajectory based on velocity (multiplied by 5 for better visualization)
             velocity = current_instance.velocity
             if show_trajectory and velocity:
+                # Trajectory based on velocity (amplified for better visualization)
+                visualization_factor = 30 * VIDEO_SCALE
                 center = box.get_center()
-                arrow_head = (int(center[0] + velocity[0] * 5), int(center[1] + velocity[1] * 5))
+                arrow_head = (int(center[0] + velocity[0] * visualization_factor), int(center[1] + velocity[1] * visualization_factor))
                 cv2.arrowedLine(result_image, center, arrow_head, (0, 0, 255), 2)
 
             # Kalman next step prediction
@@ -121,7 +131,9 @@ def draw_instances(image,
                 cov_x, cov_y = obj_track.get_current_position_uncertainty()
                 pt1 = (x - int(cov_x / 2), y - int(cov_y / 2))
                 pt2 = (x + int(cov_x / 2), y + int(cov_y / 2))
-                cv2.rectangle(result_image, pt1=pt1, pt2=pt2, color=(0, 255, 0), thickness=1)
+                rect = np.zeros(result_image.shape, np.uint8)
+                cv2.rectangle(rect, pt1=pt1, pt2=pt2, color=(0, 255, 0), thickness=1)
+                result_image = cv2.addWeighted(result_image, 1.0, rect, 0.25, 1)
 
     return result_image
 
