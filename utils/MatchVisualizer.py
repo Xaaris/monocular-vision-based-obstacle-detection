@@ -1,3 +1,10 @@
+"""
+Match Visualizer
+
+Helper class that is used to visualize keypoint matches for two given images.
+Only used for visualization purposes.
+"""
+
 import os
 
 import cv2
@@ -12,8 +19,8 @@ elif MATCHER_TYPE == MatcherType.SURF:
 else:
     from matcher.OrbMatcher import get_matches
 
-from model.DetectedObjects import DetectedObjects
-from model.ObjectInstance import create_objects
+from data_model.DetectedObjects import DetectedObjects
+from data_model.ObjectInstance import create_objects
 from mrcnn.Mask_R_CNN_COCO import detect
 from utils.image_utils import show
 import numpy as np

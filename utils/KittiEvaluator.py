@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from model.DetectedObjects import DetectedObjects
+from data_model.DetectedObjects import DetectedObjects
 
 
 def read_kitti_label_file(frame: str):

@@ -9,6 +9,7 @@ from cv2.cv2 import KeyPoint
 from Constants import MATCHER_TYPE, MatcherType, CAMERA_TYPE, VIDEO_SCALE
 from mrcnn.CocoClasses import get_class_name_for_id, get_dimensions
 
+# Specifies which matcher will be used
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 elif MATCHER_TYPE == MatcherType.SURF:
@@ -16,12 +17,15 @@ elif MATCHER_TYPE == MatcherType.SURF:
 else:
     from matcher.OrbMatcher import average_descriptor_distance, get_keypoints_and_descriptors_for_object
 
-from model.Box import Box
+from data_model.Box import Box
 from utils.timer import timing
 
 
 @dataclass
 class ObjectInstance:
+    """
+    Class holding an individual object occurrence.
+    """
     class_name: str
     roi: Box
     confidence_score: float
@@ -33,6 +37,11 @@ class ObjectInstance:
     descriptors: np.ndarray = None
 
     def similarity_to(self, obj_instance) -> float:
+        """
+        :returns value in range of [0, 1] whether this object is similar to the incoming obj_instance.
+        0 => Not similar
+        1 => Very similar
+        """
         # Check if both have descriptors
         if self.descriptors is None or obj_instance.descriptors is None:
             return 0
@@ -89,6 +98,9 @@ class ObjectInstance:
 
 @timing
 def create_objects(result, frame) -> [ObjectInstance]:
+    """
+    Generates list of ObjectInstances from the results obtained by Mask R-CNN and the current frame.
+    """
     objects = []
     number_of_results = result["class_ids"].shape[0]
 

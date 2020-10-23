@@ -16,8 +16,8 @@ import cv2
 import numpy as np
 
 from Constants import VIDEO_SCALE
-from model.Box import Box
-from model.DetectedObjects import DetectedObjects
+from data_model.Box import Box
+from data_model.DetectedObjects import DetectedObjects
 from utils.timer import timing
 
 
@@ -47,6 +47,16 @@ def apply_mask(image, mask, color, alpha=0.5):
     return image
 
 
+def filtered(class_name) -> bool:
+    """
+    Filters visualizations to a set of classes that should be shown
+    """
+    # allowed_classes = {"traffic light", "truck", "bus", "motorcycle", "car", "person"}
+    allowed_classes = {"chair", "potted plant", "cup"}
+    return class_name not in allowed_classes
+
+
+
 @timing
 def draw_instances(image,
                    detected_objects: DetectedObjects,
@@ -69,7 +79,7 @@ def draw_instances(image,
 
     for obj_id, obj_track in detected_objects.objects.items():
 
-        if obj_track.is_present():
+        if obj_track.is_present() and not filtered(obj_track.class_name):
 
             current_instance = obj_track.get_current_instance()
             print(f"{obj_track.class_name}, "
@@ -111,7 +121,7 @@ def draw_instances(image,
                 result_image = apply_mask(result_image, mask, color)
 
             velocity = current_instance.velocity
-            if show_trajectory and velocity:
+            if show_trajectory and velocity and len(obj_track.occurrences) > 4:
                 # Trajectory based on velocity (amplified for better visualization)
                 visualization_factor = 30 * VIDEO_SCALE
                 center = box.get_center()

@@ -6,6 +6,7 @@ from Constants import MATCHER_TYPE, MatcherType, INPUT_FPS, CAMERA_TYPE, VIDEO_S
 from matcher.KalmanTracker import KalmanTracker
 from mrcnn.CocoClasses import is_static
 
+# Specifies which matcher will be used
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
 elif MATCHER_TYPE == MatcherType.SURF:
@@ -13,10 +14,13 @@ elif MATCHER_TYPE == MatcherType.SURF:
 else:
     from matcher.OrbMatcher import get_matches
 
-from model.ObjectInstance import ObjectInstance
+from data_model.ObjectInstance import ObjectInstance
 
 
 class ObjectTrack:
+    """
+    Class which holds all instances of an object found throughout a video
+    """
 
     def __init__(self, first_obj_occurrence: ObjectInstance):
         self.occurrences: [Optional[ObjectInstance]] = [first_obj_occurrence]
@@ -26,6 +30,10 @@ class ObjectTrack:
         self.active = True  # Boolean whether this object is considered for matching or not
 
     def add_occurrence(self, new_obj_instance: Optional[ObjectInstance]):
+        """
+        Add latest occurrence of an object to the object track or None if previously found object wasn't found in the
+        current frame.
+        """
         self.occurrences.append(new_obj_instance)
         center_or_none = None if new_obj_instance is None else new_obj_instance.roi.get_center()
         self.kalman_tracker.update(center_or_none)
@@ -36,17 +44,28 @@ class ObjectTrack:
             self.get_current_instance().velocity = velocity
             self.get_current_instance().speed = speed
 
-
     def get_next_position_prediction(self):
+        """
+        :returns predicted position (x, y) of this object in the next frame
+        """
         return self.kalman_tracker.next_position_prediction()
 
     def get_current_position_prediction(self):
+        """
+        :returns position prediction (x, y) of this object for the current frame
+        """
         return self.kalman_tracker.current_position_prediction()
 
     def get_next_position_uncertainty(self):
+        """
+        :returns position uncertainty in x and y direction of this object in the next frame
+        """
         return self.kalman_tracker.next_position_uncertainty()
 
     def get_current_position_uncertainty(self):
+        """
+        :returns position uncertainty in x and y direction of this object in the current frame
+        """
         return self.kalman_tracker.current_position_uncertainty()
 
     def is_present(self) -> bool:
@@ -59,9 +78,17 @@ class ObjectTrack:
         return any(last_n_occurrences)  # checks if any is not None
 
     def get_current_instance(self) -> ObjectInstance:
+        """
+        :return: current instance if present, else None
+        """
         return self.occurrences[-1] if self.is_present() else None
 
     def similarity_to(self, obj_instance: ObjectInstance, over_n_instances: int = 5) -> float:
+        """
+        Returns a value in the range of [0, 1] whether the incoming obj_instance is similar to this object.
+        0 => Not similar
+        1 => Very similar
+        """
         # Check if same class
         if not self.class_name == obj_instance.class_name:
             return 0
@@ -76,6 +103,9 @@ class ObjectTrack:
         return 0
 
     def is_static(self):
+        """
+        :returns whether an object is stationary like a traffic light or not
+        """
         return is_static(self.class_name)
 
     def get_velocity(self, over_n_instances: int = INPUT_FPS):
@@ -137,13 +167,18 @@ class ObjectTrack:
                     return x, y, z
 
     def _pixel_to_meter(self, pixel: float, at_distance: float) -> float:
+        """
+        Calculates for a given number of pixels to how many meters they correspond at a given distance.
+        """
         pixel_per_meter_at_1_m = 100 * CAMERA_TYPE.value[0] * VIDEO_SCALE
         pixel_per_meter_at_distance = pixel_per_meter_at_1_m / at_distance
         meter = pixel / pixel_per_meter_at_distance
         return meter
 
     def get_2d_trajectory(self, over_n_instances: int = 5) -> Optional[Tuple[float, float]]:
-        """Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames"""
+        """
+        Returns tuple (x,y) of how the object (or rather its matched keypoints) moved on average over the last n frames
+        """
         if len(self.occurrences) >= 2:
             last_n_instances = list(reversed(self.occurrences[-over_n_instances:]))
             smoothed_translation = (0.0, 0.0)

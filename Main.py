@@ -80,8 +80,8 @@ if __name__ == "__main__":
     Constants.OUTPUT_FPS = args.outputFps
 
     # Constants need to be set before imports so that they are taken into account
-    from model.DetectedObjects import DetectedObjects
-    from model.ObjectInstance import create_objects
+    from data_model.DetectedObjects import DetectedObjects
+    from data_model.ObjectInstance import create_objects
     from mrcnn import visualize
     from mrcnn.Mask_R_CNN_COCO import detect
     from utils.image_utils import save_debug_image, show, prepare_video_output, get_frames

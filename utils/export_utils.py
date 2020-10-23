@@ -3,8 +3,8 @@
 import csv
 from typing import Optional
 
-from model.DetectedObjects import DetectedObjects
-from model.ObjectInstance import ObjectInstance
+from data_model.DetectedObjects import DetectedObjects
+from data_model.ObjectInstance import ObjectInstance
 
 
 def write_detected_objects_to_csv(detected_objects: DetectedObjects, prefix=""):
