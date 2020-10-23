@@ -1,3 +1,6 @@
+"""
+Main entrypoint
+"""
 import argparse
 import asyncio
 
@@ -7,6 +10,10 @@ from utils.timer import print_timing_results, timing
 
 @timing
 def process_video():
+    """
+    Processes the video defines in Constants
+    Saves frames for debugging, outputs video and saves results as csv
+    """
     output_video = prepare_video_output(Constants.INPUT_PATH,
                                         Constants.MATCHER_TYPE.value,
                                         Constants.FROM_SEC_OR_IMAGE,
@@ -37,6 +44,10 @@ def process_video():
 
 
 def main():
+    """
+    Main entry point.
+    Only used for time measurement.
+    """
     process_video()
     print_timing_results()
 

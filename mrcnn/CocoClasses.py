@@ -1,8 +1,15 @@
+"""
+File holding everything related to the MS COCO classes
+"""
+
 from dataclasses import dataclass
 
 
 @dataclass
 class CocoClass:
+    """
+    Class specifying a specific object type that can be recognized by Mask R-CNN
+    """
     class_name: str  # class_name = type of object
     static: bool  # static = object may be static or dynamic
     rl_dimensions: tuple  # approximate real life dimensions in x and y in cm
@@ -94,14 +101,24 @@ coco_classes = [
 
 
 def get_class_name_for_id(class_id):
+    """
+    :returns a class name to a given class id
+    Id is the position of a class in the above list
+    """
     return coco_classes[class_id].class_name
 
 
 def is_static(class_name):
+    """
+    :returns whether a class can be seen as static or not (dynamic)
+    """
     coco_class = next(filter(lambda cls: cls.class_name == class_name, coco_classes))
     return coco_class.static
 
 
 def get_dimensions(class_name):
+    """
+    :returns the approximate dimensions of an object in cm
+    """
     coco_class = next(filter(lambda cls: cls.class_name == class_name, coco_classes))
     return coco_class.rl_dimensions

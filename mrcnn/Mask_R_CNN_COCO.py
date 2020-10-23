@@ -1,3 +1,6 @@
+"""
+Configuration specific to MS COCO
+"""
 import os
 
 import mrcnn.model as modellib
@@ -42,7 +45,11 @@ class CocoConfig(Config):
 
 
 def find_closest_acceptable_number(number):
-    # find closest number which is six times divisible by 2
+    """
+    Finds closest number which is six times divisible by 2.
+    This is necessary to avoid fractions when downscaling.
+
+    """
     if number % 64 == 0:
         return number
     else:
@@ -74,6 +81,9 @@ model.load_weights(COCO_MODEL_PATH, by_name=True)
 
 @timing
 def detect(image):
+    """
+    Runs the detection on a given image
+    """
     # Run detection
     results = model.detect([image], verbose=0)
 
