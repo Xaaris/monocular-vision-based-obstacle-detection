@@ -26,7 +26,7 @@ def process_video():
                                                     Constants.INPUT_PATH,
                                                     Constants.FROM_SEC_OR_IMAGE,
                                                     Constants.TO_SEC_OR_IMAGE,
-                                                    undistort=True)):
+                                                    undistort=False)):
         result = detect(frame)
 
         newly_detected_objects = create_objects(result, frame)

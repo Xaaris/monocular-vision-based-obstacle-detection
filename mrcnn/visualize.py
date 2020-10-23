@@ -51,8 +51,8 @@ def filtered(class_name) -> bool:
     """
     Filters visualizations to a set of classes that should be shown
     """
-    # allowed_classes = {"traffic light", "truck", "bus", "motorcycle", "car", "person"}
-    allowed_classes = {"chair", "potted plant", "cup"}
+    allowed_classes = {"traffic light", "truck", "bus", "motorcycle", "car", "person"}
+    # allowed_classes = {"chair", "potted plant", "cup"}
     return class_name not in allowed_classes
 
 
