@@ -44,7 +44,7 @@ The inputs dimensions are 640x360 which is 1/6th of the original size.
  - `outputFps`: Fps of output video (default: 10)
 
 
-### Requierements:
+### Requirements:
 - This project requires Python 3.7 as it makes use of the new [Data Classes](https://docs.python.org/3/library/dataclasses.html) but Keras/Tensorflow do not support python 3.8 yet.
 - This repository uses [Git LFS](https://git-lfs.github.com) to store the large weights files.
 - The python dependencies are listed in the requirements.txt.
