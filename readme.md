@@ -32,16 +32,16 @@ This will analyze the first two seconds from the input video `data/video/IMG_582
 The inputs dimensions are 640x360 which is 1/6th of the original size.
 
 ##### Full list of arguments:
- - input: Video file or directory of images to be processed
- - from: From video second or image number (default: 0)
- - to: To video second or image number (default: None, end of the video)
- - inputType: Input type can be a VIDEO or a directory with IMAGEs (default: VIDEO)
- - inputDimensions: Input dimensions for video or image series
- - inputScale: Scale compared to original video (e.g. 0.5) (default: 1)
- - matcherType: Matcher type can be SIFT, SURF or ORB (default: SIFT)
- - cameraType: Camera type can be IPHONE_XR_4K_60, IPHONE_8_PLUS_4K_60 or FL2_14S3C_C (default: IPHONE_XR_4K_60)
- - inputFps: Fps of input video (default: 60)
- - outputFps: Fps of output video (default: 10)
+ - `input`: Video file or directory of images to be processed
+ - `from`: From video second or image number (default: 0)
+ - `to`: To video second or image number (default: None, end of the video)
+ - `inputType`: Input type can be a VIDEO or a directory with IMAGEs (default: VIDEO)
+ - `inputDimensions`: Input dimensions for video or image series
+ - `inputScale`: Scale compared to original video (e.g. 0.5) (default: 1)
+ - `matcherType`: Matcher type can be SIFT, SURF or ORB (default: SIFT)
+ - `cameraType`: Camera type can be IPHONE_XR_4K_60, IPHONE_8_PLUS_4K_60 or FL2_14S3C_C (default: IPHONE_XR_4K_60)
+ - `inputFps`: Fps of input video (default: 60)
+ - `outputFps`: Fps of output video (default: 10)
 
 
 ### Requierements:
