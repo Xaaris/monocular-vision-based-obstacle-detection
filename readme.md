@@ -16,7 +16,7 @@ Scenario 2: Dynamic camera with moving objects. Significant camera shake poses p
 [![Example video 1](./../images/images/example_3.gif?raw=true)](https://youtu.be/tHlel_Hwfm0)
 Scenario 3: Dynamic camera with static objects. The shape of the chair presents challenges to the segmentation network. 
 
-[![Example video 4](./../images/images/example_4.gif?raw=true)](https://youtu.be/2LUrM7MAVpQ)
+[![Example video 4](./../images/images/example_4.gif?raw=true)](https://youtu.be/lFGqx8aciTU)
 Scenario 1: Static camera with moving objects (Material from the [KITTI dataset](http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d))
 
 The red arrows are the object's predicted trajectory.
