@@ -35,4 +35,5 @@ def print_timing_results():
     for func in number_of_calls.keys():
         time_per_call = total_time_per_function[func] / number_of_calls[func]
         rows.append([func, number_of_calls[func], total_time_per_function[func], time_per_call])
+    print("\nTiming results: ")
     print(tabulate(rows, headers))
