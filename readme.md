@@ -12,7 +12,11 @@ This will analyze the first to seconds from the input video `data/video/IMG_5823
 The inputs dimensions are 640x360 which is 1/6th of the original size.
 
 
-### Here is an example (WIP):
+### Here are some examples (click of the gifs to get to a higher quality video): 
+[![Example video 1](./../images/images/example_1.gif?raw=true)](https://youtu.be/LYG21iKl7QE)
+[![Example video 1](./../images/images/example_2.gif?raw=true)](https://youtu.be/ayhgmKT8KWM)
+[![Example video 1](./../images/images/example_3.gif?raw=true)](https://youtu.be/tHlel_Hwfm0)
+
 ![Example video](./../images/images/example.gif?raw=true)
 
 The red arrows are the object's predicted trajectory.
