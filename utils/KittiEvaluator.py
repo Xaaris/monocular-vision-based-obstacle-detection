@@ -1,3 +1,9 @@
+"""
+Class used to compare the output of the system with the ground truth in the KITTI dataset
+See: http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d
+More details in the thesis
+"""
+
 import os
 
 import pandas as pd

@@ -8,6 +8,9 @@ from data_model.ObjectInstance import ObjectInstance
 
 
 def write_detected_objects_to_csv(detected_objects: DetectedObjects, prefix=""):
+    """
+    Writes data collected about the detected_objects to disc in csv format, prefixed by 'prefix'
+    """
     for ot_id, ot in detected_objects.objects.items():
         file = open("export/csv_export/" + prefix + "_" + ot.class_name + "_" + str(ot_id) + ".csv", 'w')
         with file:

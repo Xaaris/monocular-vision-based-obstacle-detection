@@ -88,6 +88,15 @@ async def save_debug_image(image, filename, folder=None, resize_to=None):
 
 
 def get_frames(input_type, path, from_sec_or_image=0, to_sec_or_image=None, undistort=False):
+    """
+    Retrieves frames from a video or directory in form of a generator.
+    :param input_type: May be video or directory of images
+    :param path: path to video or images
+    :param from_sec_or_image: first frame
+    :param to_sec_or_image: last frame
+    :param undistort: images should be undistorted before being returned
+    :return: a frame in a yielding fashion
+    """
     if input_type == InputDataType.VIDEO:
         return get_frames_from_video(path, from_sec_or_image, to_sec_or_image, undistort)
     elif input_type == InputDataType.IMAGE:
@@ -153,6 +162,10 @@ def draw_rectangle(image, box, color=(0, 0, 255), thickness=2, offset=(0, 0)):
 
 
 def prepare_video_output(input_path, matcher_type, from_sec_or_image, to_sec_or_image, fps, input_dimensions) -> VideoWriter:
+    """
+    Prepares the VideoWriter and creates the video file with the parameters as part of the name so that it can be
+    easily distinguished.
+    """
     output_identifier = input_path.split("/")[-1]  # Get just last part of the path
     output_identifier = output_identifier.replace(".", "_")
     output_file_path = "out/out_" + output_identifier + "_" + matcher_type + "_" + str(from_sec_or_image) + "_to_" + str(to_sec_or_image) + ".mov"
