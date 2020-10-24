@@ -168,6 +168,6 @@ def prepare_video_output(input_path, matcher_type, from_sec_or_image, to_sec_or_
     """
     output_identifier = input_path.split("/")[-1]  # Get just last part of the path
     output_identifier = output_identifier.replace(".", "_")
-    output_file_path = "out/out_" + output_identifier + "_" + matcher_type + "_" + str(from_sec_or_image) + "_to_" + str(to_sec_or_image) + ".mov"
+    output_file_path = f"export/video/out_{output_identifier}_{matcher_type}_{from_sec_or_image}_to_{to_sec_or_image}.mov"
     video_writer = cv2.VideoWriter(output_file_path, cv2.VideoWriter_fourcc("X", "V", "I", "D"), fps, input_dimensions)
     return video_writer
