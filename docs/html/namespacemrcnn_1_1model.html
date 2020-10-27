@@ -148,9 +148,9 @@ Functions</h2></td></tr>
 <tr class="separator:af555201ae9dc4534940e6af1e9b17f90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae7f3ebaa506ca362ee058fb7ee89877a"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemrcnn_1_1model.html#ae7f3ebaa506ca362ee058fb7ee89877a">unmold_image</a> (normalized_images, config)</td></tr>
 <tr class="separator:ae7f3ebaa506ca362ee058fb7ee89877a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4bfbda49280eec8c42a478d0a2eddca"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemrcnn_1_1model.html#ad4bfbda49280eec8c42a478d0a2eddca">trim_zeros_graph</a> (boxes, name='trim_zeros')</td></tr>
-<tr class="memdesc:ad4bfbda49280eec8c42a478d0a2eddca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Miscellenous Graph Functions.  <a href="namespacemrcnn_1_1model.html#ad4bfbda49280eec8c42a478d0a2eddca">More...</a><br /></td></tr>
-<tr class="separator:ad4bfbda49280eec8c42a478d0a2eddca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e77814e3c25de6941638195f8b2467f"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemrcnn_1_1model.html#a6e77814e3c25de6941638195f8b2467f">trim_zeros_graph</a> (boxes, name=&quot;trim_zeros&quot;)</td></tr>
+<tr class="memdesc:a6e77814e3c25de6941638195f8b2467f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Miscellenous Graph Functions.  <a href="namespacemrcnn_1_1model.html#a6e77814e3c25de6941638195f8b2467f">More...</a><br /></td></tr>
+<tr class="separator:a6e77814e3c25de6941638195f8b2467f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acc5473278b88c3804710d4d184c44cd0"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemrcnn_1_1model.html#acc5473278b88c3804710d4d184c44cd0">batch_pack_graph</a> (x, counts, num_rows)</td></tr>
 <tr class="separator:acc5473278b88c3804710d4d184c44cd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac22a0eafe542a71af11e949ccece0917"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacemrcnn_1_1model.html#ac22a0eafe542a71af11e949ccece0917">norm_boxes_graph</a> (boxes, shape)</td></tr>
@@ -1213,9 +1213,9 @@ Returns detections shaped: [num_detections, (y1, x1, y2, x2, class_id, score)] w
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Build a ResNet graph.
-    architecture: Can be resnet50 or resnet101
-    stage5: Boolean. If False, stage5 of the network is not created
-    train_bn: Boolean. Train or freeze Batch Norm layers
+architecture: Can be resnet50 or resnet101
+stage5: Boolean. If False, stage5 of the network is not created
+train_bn: Boolean. Train or freeze Batch Norm layers
 </pre> 
 </div>
 </div>
@@ -1378,8 +1378,8 @@ y_true and y_pred are typically: [N, 4], but could be any shape.
 </pre> 
 </div>
 </div>
-<a id="ad4bfbda49280eec8c42a478d0a2eddca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4bfbda49280eec8c42a478d0a2eddca">&#9670;&nbsp;</a></span>trim_zeros_graph()</h2>
+<a id="a6e77814e3c25de6941638195f8b2467f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e77814e3c25de6941638195f8b2467f">&#9670;&nbsp;</a></span>trim_zeros_graph()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1394,7 +1394,7 @@ y_true and y_pred are typically: [N, 4], but could be any shape.
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>name</em> = <code>'trim_zeros'</code>&#160;</td>
+          <td class="paramname"><em>name</em> = <code>&quot;trim_zeros&quot;</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
