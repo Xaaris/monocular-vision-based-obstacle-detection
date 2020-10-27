@@ -91,11 +91,12 @@ def load_calibration_data(path_to_camera_model_file):
 
 def undistort(image_path, camera_matrix, distortion_coeffs, camera_matrix_with_crop):
     from utils.image_utils import resize_image
+
     image = cv2.imread(image_path)
-    cv2.imshow('distorted', resize_image(image, (1920, 1080)))
+    cv2.imshow("distorted", resize_image(image, (1920, 1080)))
     cv2.waitKey()
     undistorted_image = cv2.undistort(image, camera_matrix, distortion_coeffs, None, camera_matrix_with_crop)
-    cv2.imshow('undistorted', resize_image(undistorted_image, (1920, 1080)))
+    cv2.imshow("undistorted", resize_image(undistorted_image, (1920, 1080)))
     cv2.waitKey()
 
 

@@ -13,6 +13,7 @@ class Box:
     x2 = Right
     y2 = Bottom
     """
+
     x1: int
     y1: int
     x2: int

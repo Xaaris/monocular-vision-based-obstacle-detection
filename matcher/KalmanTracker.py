@@ -17,22 +17,26 @@ class KalmanTracker:
     def __init__(self, initial_pos_x=0, initial_pos_y=0):
         self.kf = KalmanFilter(dim_x=6, dim_z=2)
 
-        self.kf.x = np.array([[initial_pos_x, initial_pos_y, 0., 0., 0., 0.]], np.float32).T  # state
+        self.kf.x = np.array([[initial_pos_x, initial_pos_y, 0.0, 0.0, 0.0, 0.0]], np.float32).T  # state
 
-        dt = 1.
-        self.kf.F = np.array([[1., 0., dt, 0., dt ** 2 / 2, 0.],  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
-                              [0., 1., 0., dt, 0., dt ** 2 / 2],
-                              [0., 0., 1., 0., dt, 0.],
-                              [0., 0., 0., 1., 0., dt],
-                              [0., 0., 0., 0., 1., 0.],
-                              [0., 0., 0., 0., 0., 1.]])  # state transition matrix
+        dt = 1.0
+        self.kf.F = np.array(
+            [
+                [1.0, 0.0, dt, 0.0, dt ** 2 / 2, 0.0],  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
+                [0.0, 1.0, 0.0, dt, 0.0, dt ** 2 / 2],
+                [0.0, 0.0, 1.0, 0.0, dt, 0.0],
+                [0.0, 0.0, 0.0, 1.0, 0.0, dt],
+                [0.0, 0.0, 0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+            ]
+        )  # state transition matrix
 
         self.kf.H = np.array([[1., 0, 0, 0, 0, 0],  # pos.x, pos.y, vel.x, vel.y, acc.x, acc.y
                               [0., 1, 0, 0, 0, 0]])  # Measurement function
 
         self.kf.P *= Constants.INPUT_DIMENSIONS[0] / 5  # covariance matrix
         self.kf.R = np.eye(2) * Constants.INPUT_DIMENSIONS[0] / 30  # measurement uncertainty
-        self.kf.Q = Q_discrete_white_noise(2, dt=dt, var=.1, block_size=3, order_by_dim=False)  # process uncertainty
+        self.kf.Q = Q_discrete_white_noise(2, dt=dt, var=0.1, block_size=3, order_by_dim=False)  # process uncertainty
         self.last_position_prediction = (0, 0)
         self.last_position_uncertainty = (0, 0)
 

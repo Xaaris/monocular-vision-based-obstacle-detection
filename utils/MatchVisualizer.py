@@ -12,6 +12,7 @@ import cv2
 from Constants import ROOT_DIR
 
 from Constants import MATCHER_TYPE, MatcherType
+
 if MATCHER_TYPE == MatcherType.SIFT:
     from matcher.SiftMatcher import get_matches
 elif MATCHER_TYPE == MatcherType.SURF:

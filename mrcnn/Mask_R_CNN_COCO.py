@@ -4,6 +4,7 @@ Configuration specific to MS COCO
 import os
 
 import mrcnn.model as modellib
+
 # Import Mask RCNN
 from Constants import ROOT_DIR, INPUT_DIMENSIONS
 from mrcnn import utils
@@ -25,11 +26,13 @@ if not os.path.exists(COCO_MODEL_PATH):
 # For inferencing, modify the configurations a bit to fit the task. To do so, sub-class the ```CocoConfig``` class and override the attributes you need to change.
 #
 
+
 class CocoConfig(Config):
     """Configuration for training on MS COCO.
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
     """
+
     # Give the configuration a recognizable name
     NAME = "coco"
 

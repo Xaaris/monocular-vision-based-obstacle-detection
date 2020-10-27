@@ -14,9 +14,27 @@ from data_model.DetectedObjects import DetectedObjects
 def read_kitti_label_file(frame: str):
     path = f"data/imageSet/kitti/1000/{frame}.txt"
     full_path = os.path.abspath(path)
-    df_labels = pd.read_csv(full_path,
-                            delim_whitespace=True,
-                            names=["type", "truncated", "occluded", "alpha", "bbox_left", "bbox_top", "bbox_right", "bbox_bottom", "dimensions_height", "dimensions_width", "dimensions_length", "location_x", "location_y", "location_z", "rotation_y"])
+    df_labels = pd.read_csv(
+        full_path,
+        delim_whitespace=True,
+        names=[
+            "type",
+            "truncated",
+            "occluded",
+            "alpha",
+            "bbox_left",
+            "bbox_top",
+            "bbox_right",
+            "bbox_bottom",
+            "dimensions_height",
+            "dimensions_width",
+            "dimensions_length",
+            "location_x",
+            "location_y",
+            "location_z",
+            "rotation_y",
+        ],
+    )
     df_labels_clean = df_labels.drop(["DontCare"], errors="ignore")
     df_labels_clean["location_y"] = df_labels_clean["location_y"] - df_labels_clean["dimensions_height"] / 2  # y seems to be set to bottom of object in kitti dataset for some reason
     del df_labels_clean["truncated"]
@@ -39,7 +57,19 @@ def detected_objects_to_data_frame(detected_objects: DetectedObjects):
         bbox_right = instance.roi.x2
         bbox_bottom = instance.roi.y2
         location_x, location_y, location_z = instance.get_3d_position()
-        data = pd.DataFrame({"type": type, "bbox_left": bbox_left, "bbox_top": bbox_top, "bbox_right": bbox_right, "bbox_bottom": bbox_bottom, "location_x": location_x, "location_y": location_y, "location_z": location_z}, index=["type"])
+        data = pd.DataFrame(
+            {
+                "type": type,
+                "bbox_left": bbox_left,
+                "bbox_top": bbox_top,
+                "bbox_right": bbox_right,
+                "bbox_bottom": bbox_bottom,
+                "location_x": location_x,
+                "location_y": location_y,
+                "location_z": location_z,
+            },
+            index=["type"],
+        )
         df_detected_objects = df_detected_objects.append(data, ignore_index=True)
     return df_detected_objects
 
@@ -47,11 +77,13 @@ def detected_objects_to_data_frame(detected_objects: DetectedObjects):
 def classses_match(my_obj, kitti_obj) -> bool:
     my_type = my_obj["type"]
     kitti_type = kitti_obj["type"]
-    if (my_type == "person" and kitti_type == "Pedestrian") \
-            or (my_type == "car" and kitti_type == "Car") \
-            or (my_type == "car" and kitti_type == "Van") \
-            or (my_type == "truck" and kitti_type == "Truck") \
-            or (my_type == "train" and kitti_type == "Tram"):
+    if (
+        (my_type == "person" and kitti_type == "Pedestrian")
+        or (my_type == "car" and kitti_type == "Car")
+        or (my_type == "car" and kitti_type == "Van")
+        or (my_type == "truck" and kitti_type == "Truck")
+        or (my_type == "train" and kitti_type == "Tram")
+    ):
         # Classes match!
         return True
     else:
@@ -123,10 +155,24 @@ class KittiEvaluator:
 
                         kitti_type = kitti_obj["type"]
                         kitti_x = kitti_obj["location_x"]
-                        kitti_y = - kitti_obj["location_y"]  # Kitti's y axis points down, mine points up
+                        kitti_y = -kitti_obj["location_y"]  # Kitti's y axis points down, mine points up
                         kitti_z = kitti_obj["location_z"]
 
-                        data = pd.DataFrame({"frame": frame_number, "iou": iou, "my_type": my_type, "kitti_type": kitti_type, "my_x": my_x, "my_y": my_y, "my_z": my_z, "kitti_x": kitti_x, "kitti_y": kitti_y, "kitti_z": kitti_z}, index=["frame"])
+                        data = pd.DataFrame(
+                            {
+                                "frame": frame_number,
+                                "iou": iou,
+                                "my_type": my_type,
+                                "kitti_type": kitti_type,
+                                "my_x": my_x,
+                                "my_y": my_y,
+                                "my_z": my_z,
+                                "kitti_x": kitti_x,
+                                "kitti_y": kitti_y,
+                                "kitti_z": kitti_z,
+                            },
+                            index=["frame"],
+                        )
                         print(f"Frame: {frame_number} type: {my_type} iou: {iou:.2f}")
                         self.df_combined_results = self.df_combined_results.append(data, ignore_index=True)
                         self.kitti_objects_counter_matched += 1

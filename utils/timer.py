@@ -14,6 +14,7 @@ def timing(function_to_time):
     Annotation which can be used to time the execution time of a wrapped function.
     It stores the number of invocation and the total execution time internally.
     """
+
     @wraps(function_to_time)
     def wrapper(*args, **kwargs):
         start = time()

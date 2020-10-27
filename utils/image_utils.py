@@ -132,7 +132,7 @@ def get_frames_from_image_directory(path, image_types=None, from_image=0, to_ima
     full_path_to_dir = os.path.abspath(path)
     image_paths = []
     for image_type in image_types:
-        image_paths.extend(glob.glob(os.path.join(full_path_to_dir, '*.' + image_type)))
+        image_paths.extend(glob.glob(os.path.join(full_path_to_dir, "*." + image_type)))
     image_paths.sort()
     for image_path in image_paths[from_image:to_image]:
         image = cv2.imread(image_path)

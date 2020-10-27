@@ -26,6 +26,7 @@ class ObjectInstance:
     """
     Class holding an individual object occurrence.
     """
+
     class_name: str
     roi: Box
     confidence_score: float
@@ -82,8 +83,8 @@ class ObjectInstance:
         distance = self.approximate_distance()
         angle_x_degree = (self.roi.get_position_in_image()[0] - 0.5) * CAMERA_TYPE.value[1]
         angle_y_degree = (self.roi.get_position_in_image()[1] - 0.5) * CAMERA_TYPE.value[2]
-        angle_x_radian = angle_x_degree * math.pi / 180 + math.pi/2
-        angle_y_radian = angle_y_degree * math.pi / 180 + math.pi/2
+        angle_x_radian = angle_x_degree * math.pi / 180 + math.pi / 2
+        angle_y_radian = angle_y_degree * math.pi / 180 + math.pi / 2
         x = -(distance * math.sin(angle_y_radian) * math.cos(angle_x_radian))
         y = distance * math.cos(angle_y_radian)
         z = distance * math.sin(angle_y_radian) * math.sin(angle_x_radian)

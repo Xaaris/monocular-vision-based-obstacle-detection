@@ -74,7 +74,7 @@ class ObjectTrack:
 
     def was_present_in_last_n_frames(self, n=5) -> bool:
         """Bool whether object was present in the last n frames at least once"""
-        last_n_occurrences = self.occurrences[- n:]
+        last_n_occurrences = self.occurrences[-n:]
         return any(last_n_occurrences)  # checks if any is not None
 
     def get_current_instance(self) -> ObjectInstance:
@@ -95,7 +95,7 @@ class ObjectTrack:
         # Check if location checks out
         if not self.kalman_tracker.is_point_in_predicted_area(obj_instance.roi.get_center()):
             return 0
-        last_n_occurrences = self.occurrences[- over_n_instances:]
+        last_n_occurrences = self.occurrences[-over_n_instances:]
         for occurrence in reversed(last_n_occurrences):
             if occurrence is not None:
                 return occurrence.similarity_to(obj_instance)
@@ -116,7 +116,7 @@ class ObjectTrack:
         if not self.active or not self.is_present():
             return None
         else:
-            last_n_occurrences = self.occurrences[- over_n_instances:]  # Getting last (max) n occurrences of this object
+            last_n_occurrences = self.occurrences[-over_n_instances:]  # Getting last (max) n occurrences of this object
             last_n_occurrences_filtered = [x for x in last_n_occurrences if x is not None]  # Filtering for non None values
             last_translations = list(map(lambda x: x.translation_to_last_instance, last_n_occurrences_filtered))  # mapping to positions of this object
             last_translations_filtered = [x for x in last_translations if x is not None]  # Filtering for non None values
@@ -197,18 +197,20 @@ class ObjectTrack:
                             key_point_last = last.keypoints[kp_idx_last].pt
                             translation = tuple(map(operator.sub, key_point_current, key_point_last))  # subtract current point from last one
                             cumulative_translation = tuple(map(operator.add, cumulative_translation, translation))  # add them up
-                        cumulative_translation = tuple(map(lambda x: x/len(matches), cumulative_translation))  # div by length
+                        cumulative_translation = tuple(map(lambda x: x / len(matches), cumulative_translation))  # div by length
 
-                decayed_translation = tuple(map(lambda x: x/(i + 1), cumulative_translation))  # decay: less impact for older instances
+                decayed_translation = tuple(map(lambda x: x / (i + 1), cumulative_translation))  # decay: less impact for older instances
                 smoothed_translation = tuple(map(operator.add, smoothed_translation, decayed_translation))  # add them up
 
-            smoothed_translation = tuple(map(lambda x: x/over_n_instances, smoothed_translation))  # div by over_n_instances
+            smoothed_translation = tuple(map(lambda x: x / over_n_instances, smoothed_translation))  # div by over_n_instances
             return smoothed_translation
 
     def __str__(self):
-        return f"{len(self.occurrences)} occurrences, " \
-               f"current instance: {self.get_current_instance()}, " \
-               f"present in last 5 frames: {self.was_present_in_last_n_frames(5)}, " \
-               f"next predicted pos: {self.get_next_position_prediction()}, " \
-               f"pos uncertainty: {self.get_next_position_uncertainty()}," \
-               f"trajectory: {self.get_2d_trajectory()}"
+        return (
+            f"{len(self.occurrences)} occurrences, "
+            f"current instance: {self.get_current_instance()}, "
+            f"present in last 5 frames: {self.was_present_in_last_n_frames(5)}, "
+            f"next predicted pos: {self.get_next_position_prediction()}, "
+            f"pos uncertainty: {self.get_next_position_uncertainty()},"
+            f"trajectory: {self.get_2d_trajectory()}"
+        )

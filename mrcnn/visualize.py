@@ -56,19 +56,20 @@ def filtered(class_name) -> bool:
     return class_name not in allowed_classes
 
 
-
 @timing
-def draw_instances(image,
-                   detected_objects: DetectedObjects,
-                   show_mask=True,
-                   show_bbox=True,
-                   show_label=True,
-                   show_trajectory=True,
-                   show_confidence_score=False,
-                   show_distance=True,
-                   show_3d_position=False,
-                   show_kalman_next_prediction_area=False,
-                   show_kalman_last_prediction_area=True):
+def draw_instances(
+    image,
+    detected_objects: DetectedObjects,
+    show_mask=True,
+    show_bbox=True,
+    show_label=True,
+    show_trajectory=True,
+    show_confidence_score=False,
+    show_distance=True,
+    show_3d_position=False,
+    show_kalman_next_prediction_area=False,
+    show_kalman_last_prediction_area=True,
+):
     """
     image: image to copy and illustrate on
     detected_objects: objects to draw
@@ -82,13 +83,15 @@ def draw_instances(image,
         if obj_track.is_present() and not filtered(obj_track.class_name):
 
             current_instance = obj_track.get_current_instance()
-            print(f"{obj_track.class_name}, "
-                  f"id: {obj_id}, "
-                  f"tracked for {len(obj_track.occurrences)} frames, "
-                  f"3D pos: {tuple(map(lambda e: round(e, 2), current_instance.get_3d_position()))}, "
-                  f"distance: {current_instance.approximate_distance() :.2f}m, "
-                  f"velocity: {tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else 'None'}, "
-                  f"speed: {round(current_instance.speed, 2) if current_instance.speed is not None else 'None '}km/h")
+            print(
+                f"{obj_track.class_name}, "
+                f"id: {obj_id}, "
+                f"tracked for {len(obj_track.occurrences)} frames, "
+                f"3D pos: {tuple(map(lambda e: round(e, 2), current_instance.get_3d_position()))}, "
+                f"distance: {current_instance.approximate_distance() :.2f}m, "
+                f"velocity: {tuple(map(lambda e: round(e, 2), current_instance.velocity)) if current_instance.velocity is not None else 'None'}, "
+                f"speed: {round(current_instance.speed, 2) if current_instance.speed is not None else 'None '}km/h"
+            )
 
             color = static_colors[obj_id % max_number_of_colors]
 
@@ -112,8 +115,7 @@ def draw_instances(image,
                     label_text += f"dist: {current_instance.approximate_distance() : .1f}m "
                 if show_3d_position:
                     label_text += f"3D pos: {current_instance.get_3d_position()} "
-                cv2.putText(result_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
-                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+                cv2.putText(result_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.4, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
             # Mask
             if show_mask:
@@ -176,8 +178,7 @@ def draw_depth_map(image, detected_objects: DetectedObjects, show_distance=False
                 box: Box = current_instance.roi
                 class_name = current_instance.class_name
                 label_text = f"{class_name} : {distance :.1f}m"
-                cv2.putText(depth_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=.4,
-                            color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
+                cv2.putText(depth_image, label_text, (box.x1, box.y1 - 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.4, color=(0, 0, 255), thickness=1, lineType=cv2.LINE_AA)
 
             # Mask
             mask = current_instance.mask
